@@ -40,6 +40,11 @@ private:
 	void initializeRouter();
 	void initializeMiddleware();
 
+
+	void packageResp(const std::string& version, http::HttpResponse::HttpStatusCode statusCode,
+		const std::string& statusMsg, bool close, const std::string& contentType,
+		int contentLen, const std::string& body, http::HttpResponse* resp);
+
 	void setSessionManager(std::unique_ptr<http::session::SessionManager> manager)
 	{
 		httpServer_.setSessionManager(std::move(manager));

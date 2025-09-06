@@ -62,3 +62,41 @@ void ChatServer::initializeMiddleware() {
     // 添加中间件
     httpServer_.addMiddleware(corsMiddleware);
 }
+
+
+void GomokuServer::packageResp(const std::string& version,
+    http::HttpResponse::HttpStatusCode statusCode,
+    const std::string& statusMsg,
+    bool close,
+    const std::string& contentType,
+    int contentLen,
+    const std::string& body,
+    http::HttpResponse* resp)
+{
+    if (resp == nullptr)
+    {
+        LOG_ERROR << "Response pointer is null";
+        return;
+    }
+
+    try
+    {
+        resp->setVersion(version);
+        resp->setStatusCode(statusCode);
+        resp->setStatusMessage(statusMsg);
+        resp->setCloseConnection(close);
+        resp->setContentType(contentType);
+        resp->setContentLength(contentLen);
+        resp->setBody(body);
+
+        LOG_INFO << "Response packaged successfully";
+    }
+    catch (const std::exception& e)
+    {
+        LOG_ERROR << "Error in packageResp: " << e.what();
+        // 设置一个基本的错误响应
+        resp->setStatusCode(http::HttpResponse::k500InternalServerError);
+        resp->setStatusMessage("Internal Server Error");
+        resp->setCloseConnection(true);
+    }
+}
