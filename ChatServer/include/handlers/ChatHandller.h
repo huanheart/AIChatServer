@@ -6,12 +6,12 @@
 class ChatHandler : public http::router::RouterHandler
 {
 public:
-    explicit ChatHandler(GomokuServer* server) : server_(server) {}
+    explicit ChatHandler(ChatServer* server) : server_(server) {}
 
     void handle(const http::HttpRequest& req, http::HttpResponse* resp) override;
 private:
 
 private:
-    GomokuServer* server_;
+    ChatServer* server_;
     http::MysqlUtil     mysqlUtil_;
 };

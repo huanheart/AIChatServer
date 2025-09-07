@@ -15,7 +15,7 @@
 #include "../../../HttpServer/include/utils/MysqlUtil.h"
 #include "../../../HttpServer/include/utils/FileUtil.h"
 #include "../../../HttpServer/include/utils/JsonUtil.h"
-
+#include"AIUtil/AIHelper.h"
 
 class ChatLoginHandler;
 class ChatRegisterHandler;
@@ -24,7 +24,10 @@ class ChatHandler;
 
 class ChatServer {
 public:
-	ChatServer();
+	ChatServer(int port,
+		const std::string& name,
+		muduo::net::TcpServer::Option option);
+
 	void setThreadNum(int numThreads);
 	void start();
 
@@ -60,8 +63,8 @@ private:
 	//保证一个用户只能在同一个地点登录一次
 	std::unordered_map<int, bool>	onlineUsers_;
 	std::mutex	mutexForOnlineUsers_;
-	//每一个人都有对应的对话
-	std::unordered_map<int, std::string> chatInformation;
+	//每一个人都有对应的对话 userid->AIHelper
+	std::unordered_map<int, std::shared_ptr<AIHelper>> chatInformation;
 	std::mutex	mutexForChatInformation;
 };
 

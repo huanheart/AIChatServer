@@ -1,9 +1,8 @@
+#include "../../include/handlers/ChatSendHandler.h"
 
-#include "../../include/handlers/ChatHandler.h"
 
-void ChatHandler::handle(const http::HttpRequest& req, http::HttpResponse* resp)
+void ChatSendHandler::handle(const http::HttpRequest& req, http::HttpResponse* resp)
 {
-    // JSON 解析使用 try catch 捕获异常
     try
     {
         // 检查用户是否已登录
@@ -23,37 +22,40 @@ void ChatHandler::handle(const http::HttpRequest& req, http::HttpResponse* resp)
             return;
         }
 
-        // 获取用户信息
+        // 获取用户信息以及获取用户对应的表数据
         int userId = std::stoi(session->getValue("userId"));
         std::string username = session->getValue("username");
-
-        std::string reqFile("../AIApps/ChatServer/resource/AI.html");
-        FileUtil fileOperater(reqFile);
-        if (!fileOperater.isValid())
+        std::shared_ptr<AIHelper> AIHelperPtr;
         {
-            LOG_WARN << reqFile << "not exist.";
-            fileOperater.resetDefaultFile();
+            std::lock_guard<std::mutex> lock(server_->mutexForChatInformation);
+            if (chatInformation.find(userId) == chatInformation.end()) {
+                //从linux环境变量中拿取对应的api-key并初始化一个AIHelper
+                const char* apiKey = std::getenv("DASHSCOPE_API_KEY");
+                if (!apiKey) {
+                    std::cerr << "Error: DASHSCOPE_API_KEY not found in environment!" << std::endl;
+                    return;
+                }
+                // 插入一个新的 AIHelper
+                chatInformation.emplace(
+                    userId,           
+                    std::make_shared<AIHelper>(apiKey)
+                );
+            }
+            AIHelperPtr=chatInformation[userId];
         }
+        AIHelperPtr->addUserMessage(session->getValue("chatInformation") );
+        std::string aiInformation=AIHelperPtr->chat();
+        json successResp;
+        successResp["success"] = true;
+        successResp["Information"] = aiInformation;
+        std::string successBody = successResp.dump(4);
 
-        std::vector<char> buffer(fileOperater.size());
-        fileOperater.readFile(buffer); // 读出文件数据
-        std::string htmlContent(buffer.data(), buffer.size());
-
-        // 在HTML内容中插入userId
-        size_t headEnd = htmlContent.find("</head>");
-        if (headEnd != std::string::npos)
-        {
-            std::string script = "<script>const userId = '" + std::to_string(userId) + "';</script>";
-            htmlContent.insert(headEnd, script);
-        }
-
-        // server_->packageResp(req.getVersion(), HttpResponse::k200Ok, "OK"
-        //             , false, "text/html", htmlContent.size(), htmlContent, resp);
         resp->setStatusLine(req.getVersion(), http::HttpResponse::k200Ok, "OK");
         resp->setCloseConnection(false);
-        resp->setContentType("text/html");
-        resp->setContentLength(htmlContent.size());
-        resp->setBody(htmlContent);
+        resp->setContentType("application/json");
+        resp->setContentLength(successBody.size());
+        resp->setBody(successBody);
+        return;
     }
     catch (const std::exception& e)
     {
@@ -69,5 +71,12 @@ void ChatHandler::handle(const http::HttpRequest& req, http::HttpResponse* resp)
         resp->setBody(failureBody);
     }
 }
+
+
+
+
+
+
+
 
 

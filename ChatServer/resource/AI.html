@@ -79,21 +79,60 @@
   </style>
 </head>
 <body>
-  <div class="chat-container">
-    <!-- 多轮对话渲染 -->
-    <!-- 后端循环渲染消息列表 -->
-    <!-- messages 是一个列表，每条消息包含 role 和 content -->
-    % for msg in messages:
-      <div class="message {{msg.role}}">
-        <b>{{ "你" if msg.role == "user" else "AI" }}:</b> {{ msg.content }}
-      </div>
-    % endfor
+  <div class="chat-container" id="chat-container">
+    <!-- 初始消息可以由后端渲染 -->
   </div>
 
   <!-- 输入框 -->
-  <form class="input-box" method="POST" action="/chat">
-    <textarea name="question" placeholder="请输入你的问题..." required></textarea>
+  <form class="input-box" id="chat-form">
+    <textarea id="question" placeholder="请输入你的问题..." required></textarea>
     <button type="submit">发送</button>
   </form>
+
+  <script>
+    const chatContainer = document.getElementById('chat-container');
+    const chatForm = document.getElementById('chat-form');
+    const questionInput = document.getElementById('question');
+
+    // 渲染消息
+    function appendMessage(role, content) {
+      const msgDiv = document.createElement('div');
+      msgDiv.classList.add('message', role);
+      msgDiv.innerHTML = `<b>${role === 'user' ? '你' : 'AI'}:</b> ${content}`;
+      chatContainer.appendChild(msgDiv);
+      chatContainer.scrollTop = chatContainer.scrollHeight; // 自动滚动到底部
+    }
+
+    chatForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const question = questionInput.value.trim();
+      if (!question) return;
+
+      // 1️⃣ 用户消息先渲染
+      appendMessage('user', question);
+      questionInput.value = '';
+
+      try {
+        // 2️⃣ 调用服务端 /chat/send 接口
+        const response = await fetch('/chat/send', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ question })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          // 3️⃣ AI 回复渲染
+          appendMessage('assistant', data.Information);
+        } else {
+          appendMessage('assistant', '[错误] ' + (data.message || '未知错误'));
+        }
+      } catch (err) {
+        console.error(err);
+        appendMessage('assistant', '[错误] 无法连接到服务器');
+      }
+    });
+  </script>
 </body>
 </html>

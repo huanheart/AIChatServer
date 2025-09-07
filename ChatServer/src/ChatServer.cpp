@@ -2,6 +2,9 @@
 #include "../include/handlers/ChatRegisterHandler.h"
 #include "../include/handlers/ChatLogoutHandler.h"
 #include"../include/handlers/ChatHandller.h"
+#incllude"../include/handlers/ChatEntryHandler.h"
+#include"../include/handlers/ChatSendHandler.h"
+
 
 #include "../include/ChatServer.h"
 #include "../../../HttpServer/include/http/HttpRequest.h"
@@ -10,10 +13,14 @@
 
 using namespace http;
 
-ChatServer::ChatServer() {
-	initialize();
-}
 
+ChatServer::ChatServer(int port,
+    const std::string& name,
+    muduo::net::TcpServer::Option option)
+    : httpServer_(port, name, option), maxOnline_(0)
+{
+    initialize();
+}
 
 void ChatServer::initialize() {
 	http::MysqlUtil::init("tcp://127.0.0.1:3306", "root", "123456", "ChatHttpServer", 10);
@@ -36,15 +43,20 @@ void ChatServer::start() {
 
 
 void ChatServer::initializeRouter() {
+    // 注册url回调处理器
+    // 登录注册入口页面
+    httpServer_.Get("/", std::make_shared<ChatEntryHandler>(this));
+    httpServer_.Get("/entry", std::make_shared<ChatEntryHandler>(this));
     // 登录
     httpServer_.Post("/login", std::make_shared<ChatLoginHandler>(this));
     // 注册
     httpServer_.Post("/register", std::make_shared<ChatRegisterHandler>(this));
     //登出
     httpServer_.Post("/user/logout", std::make_shared<ChatLogoutHandler>(this));
-    //聊天
-    httpServer_.Post("/chat", std::make_shared<ChatHandler>(this));
-
+    //聊天入口
+    httpServer_.Get("/chat", std::make_shared<ChatHandler>(this));
+    //聊天请求
+    httpServer_.Post("/chat/send", std::make_shared<ChatSendHandler>(this));
 }
 
 void ChatServer::initializeSession() {
@@ -64,7 +76,7 @@ void ChatServer::initializeMiddleware() {
 }
 
 
-void GomokuServer::packageResp(const std::string& version,
+void ChatServer::packageResp(const std::string& version,
     http::HttpResponse::HttpStatusCode statusCode,
     const std::string& statusMsg,
     bool close,

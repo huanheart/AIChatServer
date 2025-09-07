@@ -7,7 +7,7 @@
 class ChatRegisterHandler : public http::router::RouterHandler
 {
 public:
-    explicit ChatRegisterHandler(GomokuServer* server) : server_(server) {}
+    explicit ChatRegisterHandler(ChatServer* server) : server_(server) {}
 
     void handle(const http::HttpRequest& req, http::HttpResponse* resp) override;
 private:
