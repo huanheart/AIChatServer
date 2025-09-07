@@ -21,6 +21,8 @@ class ChatLoginHandler;
 class ChatRegisterHandler;
 class ChatLogoutHandler;
 class ChatHandler;
+class ChatEntryHandler;
+class ChatSendHandler;
 
 class ChatServer {
 public:
@@ -34,8 +36,10 @@ public:
 private:
 	friend class ChatLoginHandler;
 	friend class ChatRegisterHandler;
-	friend class ChatLogoutHandler;
+	friend  ChatLogoutHandler;
 	friend class ChatHandler;
+	friend class ChatEntryHandler;
+	friend class ChatSendHandler;
 
 private:
 	void initialize();

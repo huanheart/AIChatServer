@@ -1,8 +1,8 @@
 #include "../include/handlers/ChatLoginHandler.h"
 #include "../include/handlers/ChatRegisterHandler.h"
 #include "../include/handlers/ChatLogoutHandler.h"
-#include"../include/handlers/ChatHandller.h"
-#incllude"../include/handlers/ChatEntryHandler.h"
+#include"../include/handlers/ChatHandler.h"
+#include"../include/handlers/ChatEntryHandler.h"
 #include"../include/handlers/ChatSendHandler.h"
 
 
@@ -17,7 +17,7 @@ using namespace http;
 ChatServer::ChatServer(int port,
     const std::string& name,
     muduo::net::TcpServer::Option option)
-    : httpServer_(port, name, option), maxOnline_(0)
+    : httpServer_(port, name, option)
 {
     initialize();
 }

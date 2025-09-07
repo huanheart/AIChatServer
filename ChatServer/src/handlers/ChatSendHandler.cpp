@@ -1,4 +1,4 @@
-#include "../../include/handlers/ChatSendHandler.h"
+#include "../include/handlers/ChatSendHandler.h"
 
 
 void ChatSendHandler::handle(const http::HttpRequest& req, http::HttpResponse* resp)
@@ -28,7 +28,7 @@ void ChatSendHandler::handle(const http::HttpRequest& req, http::HttpResponse* r
         std::shared_ptr<AIHelper> AIHelperPtr;
         {
             std::lock_guard<std::mutex> lock(server_->mutexForChatInformation);
-            if (chatInformation.find(userId) == chatInformation.end()) {
+            if (server_->chatInformation.find(userId) == server_->chatInformation.end()) {
                 //从linux环境变量中拿取对应的api-key并初始化一个AIHelper
                 const char* apiKey = std::getenv("DASHSCOPE_API_KEY");
                 if (!apiKey) {
@@ -36,12 +36,12 @@ void ChatSendHandler::handle(const http::HttpRequest& req, http::HttpResponse* r
                     return;
                 }
                 // 插入一个新的 AIHelper
-                chatInformation.emplace(
+                server_->chatInformation.emplace(
                     userId,           
                     std::make_shared<AIHelper>(apiKey)
                 );
             }
-            AIHelperPtr=chatInformation[userId];
+            AIHelperPtr= server_->chatInformation[userId];
         }
         AIHelperPtr->addUserMessage(session->getValue("chatInformation") );
         std::string aiInformation=AIHelperPtr->chat();

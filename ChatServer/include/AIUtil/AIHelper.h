@@ -5,7 +5,8 @@
 #include <curl/curl.h>
 #include <iostream>
 #include <sstream>
-#include <nlohmann/json.hpp>
+
+#include "../../../../HttpServer/include/utils/JsonUtil.h"
 
 //这边封装curl去访问对阿里的模型
 
