@@ -3,7 +3,8 @@
 
 // 构造函数
 AIHelper::AIHelper(const std::string& apiKey)
-    : apiKey_(apiKey) {}
+    : apiKey_(apiKey) {
+}
 
 // 设置默认模型
 void AIHelper::setModel(const std::string& modelName) {
@@ -12,6 +13,7 @@ void AIHelper::setModel(const std::string& modelName) {
 
 // 添加一条用户消息
 void AIHelper::addUserMessage(const std::string& userInput) {
+    std::cout << "test userInput is " << userInput << std::endl;
     messages.push_back(userInput);
     // TODO: 在这里调用 pushMessageToMysql() 异步入库
     pushMessageToMysql();
@@ -39,6 +41,9 @@ std::string AIHelper::chat() {
     }
 
     payload["messages"] = msgArray;
+
+    // 打印 payload（缩进 4 个空格）
+    std::cout << "[DEBUG] payload = " << payload.dump(4) << std::endl;
 
     // 执行请求
     json response = executeCurl(payload);
@@ -74,7 +79,7 @@ json AIHelper::executeCurl(const json& payload) {
     headers = curl_slist_append(headers, "Content-Type: application/json");
 
     std::string payloadStr = payload.dump();
-
+    std::cout << "test json->payloadStr " << payloadStr << std::endl;
     curl_easy_setopt(curl, CURLOPT_URL, apiUrl_.c_str());
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, payloadStr.c_str());

@@ -1,6 +1,5 @@
 #include "../include/handlers/ChatSendHandler.h"
 
-
 void ChatSendHandler::handle(const http::HttpRequest& req, http::HttpResponse* resp)
 {
     try
@@ -43,7 +42,17 @@ void ChatSendHandler::handle(const http::HttpRequest& req, http::HttpResponse* r
             }
             AIHelperPtr= server_->chatInformation[userId];
         }
-        AIHelperPtr->addUserMessage(session->getValue("chatInformation") );
+
+        std::string userQuestion;
+        auto body = req.getBody();
+        if (!body.empty()) {
+            auto j = json::parse(body);
+            if (j.contains("question")) userQuestion = j["question"];
+        }
+
+        AIHelperPtr->addUserMessage(userQuestion);
+
+
         std::string aiInformation=AIHelperPtr->chat();
         json successResp;
         successResp["success"] = true;
