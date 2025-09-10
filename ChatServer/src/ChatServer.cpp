@@ -4,12 +4,18 @@
 #include"../include/handlers/ChatHandler.h"
 #include"../include/handlers/ChatEntryHandler.h"
 #include"../include/handlers/ChatSendHandler.h"
+#include"../include/handlers/AIMenuHandler.h"
+#include"../include/handlers/AIUploadSendHandler.h"
+#include"../include/handlers/AIUploadHandler.h"
+
 
 
 #include "../include/ChatServer.h"
 #include "../../../HttpServer/include/http/HttpRequest.h"
 #include "../../../HttpServer/include/http/HttpResponse.h"
 #include "../../../HttpServer/include/http/HttpServer.h"
+
+
 
 using namespace http;
 
@@ -53,10 +59,16 @@ void ChatServer::initializeRouter() {
     httpServer_.Post("/register", std::make_shared<ChatRegisterHandler>(this));
     //登出
     httpServer_.Post("/user/logout", std::make_shared<ChatLogoutHandler>(this));
-    //聊天入口
+    //聊天页面入口
     httpServer_.Get("/chat", std::make_shared<ChatHandler>(this));
     //聊天请求
     httpServer_.Post("/chat/send", std::make_shared<ChatSendHandler>(this));
+    //菜单页面
+    httpServer_.Get("/menu", std::make_shared<AIMenuHandler>(this));
+    //上传页面入口
+    httpServer_.Get("/upload", std::make_shared<AIUploadHandler>(this));
+    //上传请求
+    httpServer_.Post("/upload/send", std::make_shared<AIUploadSendHandler>(this));
 }
 
 void ChatServer::initializeSession() {
