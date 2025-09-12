@@ -45,6 +45,13 @@
             border-bottom-left-radius: 0;
         }
 
+        .message img {
+            max-width: 200px;
+            border-radius: 8px;
+            display: block;
+            margin-top: 8px;
+        }
+
         .input-box {
             display: flex;
             padding: 10px;
@@ -90,10 +97,20 @@
         const imageInput = document.getElementById('image-input');
 
         // 渲染消息
-        function appendMessage(role, content) {
+        function appendMessage(role, content, imageUrl = null) {
             const msgDiv = document.createElement('div');
             msgDiv.classList.add('message', role);
+
+            // 文字部分
             msgDiv.innerHTML = `<b>${role === 'user' ? '你' : 'AI'}:</b> ${content}`;
+
+            // 如果有图片则附加
+            if (imageUrl) {
+                const img = document.createElement('img');
+                img.src = imageUrl;
+                msgDiv.appendChild(img);
+            }
+
             chatContainer.appendChild(msgDiv);
             chatContainer.scrollTop = chatContainer.scrollHeight;
         }
@@ -105,31 +122,45 @@
 
             const file = imageInput.files[0];
 
-            // 显示用户上传消息
-            appendMessage('user', `已上传图片: ${file.name}`);
+            // 使用 FileReader 转成 Base64 并展示本地预览
+            const reader = new FileReader();
+            reader.onload = async function (event) {
+                const base64Url = event.target.result;
+                const base64Data = base64Url.split(',')[1]; // 去掉 data:image/...;base64, 前缀
 
-            const formData = new FormData();
-            formData.append("image", file);
+                // 显示用户上传图片消息（带预览）
+                appendMessage('user', `已上传图片: ${file.name}`, base64Url);
 
-            try {
-                const response = await fetch('/upload', {
-                    method: 'POST',
-                    body: formData
-                });
+                const payload = {
+                    filename: file.name,
+                    image: base64Data
+                };
 
-                if (!response.ok) throw new Error("上传失败");
+                try {
+                    const response = await fetch('/upload', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(payload)
+                    });
 
-                const data = await response.json();
-                // 假设后端返回 { class_name: "类别名称", confidence: 0.92 }
-                const aiText = `识别结果: ${data.class_name} (置信度: ${Math.round(data.confidence * 100)}%)`;
-                appendMessage('assistant', aiText);
+                    if (!response.ok) throw new Error("上传失败");
 
-            } catch (err) {
-                appendMessage('assistant', `[错误] 无法连接到服务器或上传失败: ${err.message}`);
-            }
+                    const data = await response.json();
+                    // 假设后端返回 { class_name: "类别名称", confidence: 0.92 }
+                    const aiText = `识别结果: ${data.class_name} (置信度: ${Math.round(data.confidence * 100)}%)`;
+                    appendMessage('assistant', aiText);
 
-            // 清空文件选择
-            imageInput.value = '';
+                } catch (err) {
+                    appendMessage('assistant', `[错误] 无法连接到服务器或上传失败: ${err.message}`);
+                }
+
+                // 清空文件选择
+                imageInput.value = '';
+            };
+
+            reader.readAsDataURL(file);
         });
     </script>
 

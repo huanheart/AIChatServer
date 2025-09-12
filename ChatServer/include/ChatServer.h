@@ -11,11 +11,14 @@
 #include <string>
 #include <vector>
 
+#include "base64.h"
 #include "../../../HttpServer/include/http/HttpServer.h"
 #include "../../../HttpServer/include/utils/MysqlUtil.h"
 #include "../../../HttpServer/include/utils/FileUtil.h"
 #include "../../../HttpServer/include/utils/JsonUtil.h"
 #include"AIUtil/AIHelper.h"
+#include"AIUtil/ImageRecognizer.h"
+
 
 class ChatLoginHandler;
 class ChatRegisterHandler;
@@ -73,5 +76,8 @@ private:
 	//里面的vector进行插入操作，那么用户A访问AI的操作就会严重影响到用户B
 	std::unordered_map<int, std::shared_ptr<AIHelper>> chatInformation;
 	std::mutex	mutexForChatInformation;
+
+	std::unordered_map<int, std::shared_ptr<ImageRecognizer> > ImageRecognizerMap;
+	std::mutex	mutexForImageRecognizerMap;
 };
 

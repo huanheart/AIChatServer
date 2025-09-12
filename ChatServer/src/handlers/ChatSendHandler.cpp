@@ -23,7 +23,6 @@ void ChatSendHandler::handle(const http::HttpRequest& req, http::HttpResponse* r
 
         // 获取用户信息以及获取用户对应的表数据
         int userId = std::stoi(session->getValue("userId"));
-        std::string username = session->getValue("username");
         std::shared_ptr<AIHelper> AIHelperPtr;
         {
             std::lock_guard<std::mutex> lock(server_->mutexForChatInformation);
