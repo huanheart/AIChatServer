@@ -42,8 +42,8 @@ void AIUploadSendHandler::handle(const http::HttpRequest& req, http::HttpRespons
         std::string imageBase64;
         if (!body.empty()) {
             auto j = json::parse(body);
-            if (j.filename("filename")) filename = j["filename"];
-            if (j.filename("image")) imageBase64 = j["image"];
+            if (j.contains("filename")) filename = j["filename"];
+            if (j.contains("image")) imageBase64 = j["image"];
         }
         if (imageBase64.empty())
         {
@@ -93,23 +93,5 @@ void AIUploadSendHandler::handle(const http::HttpRequest& req, http::HttpRespons
     }
 }
 
-/*
 
-int main() {
-    ImageRecognizer recog("resnet50.onnx");
-
-    // 1. 从文件预测
-    int cls1 = recog.PredictFromFile("dog.jpg");
-    std::cout << "PredictFromFile: " << cls1 << std::endl;
-
-    // 2. 从内存数据预测（模拟前端上传）
-    std::ifstream file("dog.jpg", std::ios::binary);
-    std::vector<unsigned char> buffer((std::istreambuf_iterator<char>(file)), {});
-    int cls2 = recog.PredictFromBuffer(buffer);
-    std::cout << "PredictFromBuffer: " << cls2 << std::endl;
-
-    return 0;
-}
-
-*/
 

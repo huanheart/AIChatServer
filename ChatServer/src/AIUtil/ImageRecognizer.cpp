@@ -1,4 +1,4 @@
-#include"../include/AIUtil/ImageRecognizer.h"
+#include "../include/AIUtil/ImageRecognizer.h"
 #include <iostream>
 #include <algorithm>
 
@@ -7,8 +7,9 @@ ImageRecognizer::ImageRecognizer(const std::string& model_path)
 {
     Ort::SessionOptions session_options;
     session_options.SetIntraOpNumThreads(1);
-    session = std::make_unique<Ort::Session>(env, model_path.c_str(), session_options);
+    session_options.SetGraphOptimizationLevel(GraphOptimizationLevel::ORT_ENABLE_EXTENDED);
 
+    session = std::make_unique<Ort::Session>(env, model_path.c_str(), session_options);
     allocator = std::make_unique<Ort::AllocatorWithDefaultOptions>();
 
     // 获取输入输出名字
@@ -58,10 +59,15 @@ int ImageRecognizer::PredictFromMat(const cv::Mat& img_raw) {
     Ort::Value input_tensor = Ort::Value::CreateTensor<float>(
         memory_info, img.ptr<float>(), input_tensor_size, dims.data(), dims.size());
 
+    // ONNX Runtime 1.20 正确调用方式
+    const char* input_names[] = { input_name.c_str() };
+    const char* output_names[] = { output_name.c_str() };
+
     auto output_tensors = session->Run(
         Ort::RunOptions{ nullptr },
-        &input_name, &input_tensor, 1,
-        &output_name, 1);
+        input_names, &input_tensor, 1,
+        output_names, 1
+    );
 
     float* output_data = output_tensors.front().GetTensorMutableData<float>();
 

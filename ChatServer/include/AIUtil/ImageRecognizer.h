@@ -29,5 +29,3 @@ private:
     std::vector<int64_t> input_shape;
     int input_height{}, input_width{};
 };
-
-#endif // IMAGE_RECOGNIZER_H

@@ -27,6 +27,11 @@ class ChatHandler;
 class ChatEntryHandler;
 class ChatSendHandler;
 
+class AIMenuHandler;
+class AIUploadHandler;
+class AIUploadSendHandler;
+
+
 class ChatServer {
 public:
 	ChatServer(int port,
@@ -43,6 +48,9 @@ private:
 	friend class ChatHandler;
 	friend class ChatEntryHandler;
 	friend class ChatSendHandler;
+	friend class AIMenuHandler;
+	friend class AIUploadHandler;
+	friend class AIUploadSendHandler;
 
 private:
 	void initialize();
