@@ -50,13 +50,9 @@ void AIUploadSendHandler::handle(const http::HttpRequest& req, http::HttpRespons
             throw std::runtime_error("No image data provided");
         }
 
-        // 2. base64 解码
         std::string decodedData = base64_decode(imageBase64);
         std::vector<uchar> imgData(decodedData.begin(), decodedData.end());
-
-        // 3. 调用识别逻辑
-        // 假设你在服务启动时已经初始化了 ImageRecognizer
-        // 比如：ImageRecognizer recognizer("/root/model.onnx");
+        //开始进行识别
         int predClass = ImageRecognizerPtr->PredictFromBuffer(imgData);
 
         // TODO: 这里你应该有个类别表，比如 ImageNet 的 label

@@ -11,14 +11,14 @@
 #include <string>
 #include <vector>
 
-#include "base64.h"
+
 #include "../../../HttpServer/include/http/HttpServer.h"
 #include "../../../HttpServer/include/utils/MysqlUtil.h"
 #include "../../../HttpServer/include/utils/FileUtil.h"
 #include "../../../HttpServer/include/utils/JsonUtil.h"
 #include"AIUtil/AIHelper.h"
 #include"AIUtil/ImageRecognizer.h"
-
+#include"AIUtil/base64.h"
 
 class ChatLoginHandler;
 class ChatRegisterHandler;
