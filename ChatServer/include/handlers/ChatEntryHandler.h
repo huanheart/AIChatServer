@@ -11,4 +11,9 @@ public:
 
 private:
     ChatServer* server_;
+    /*
+        http::MysqlUtil mysqlUtil_;
+        bool init=false;
+    */
+
 };

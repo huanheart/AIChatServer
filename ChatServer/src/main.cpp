@@ -1,5 +1,7 @@
 #include <string>
 #include <iostream>
+#include <thread>
+#include <chrono>
 #include <muduo/net/TcpServer.h>
 #include <muduo/base/Logging.h>
 #include <muduo/net/EventLoop.h>
@@ -29,5 +31,8 @@ int main(int argc, char* argv[]) {
     muduo::Logger::setLogLevel(muduo::Logger::WARN);
     ChatServer server(port, serverName);
     server.setThreadNum(4);
+    std::this_thread::sleep_for(std::chrono::seconds(2));
+    //初始化chat_message表到chatInformation中
+    server.initChatMessage();    
     server.start();
 }
