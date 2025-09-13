@@ -1,5 +1,5 @@
 #include "../include/handlers/AIMenuHandler.h"
-//已看完
+
 void AIMenuHandler::handle(const http::HttpRequest& req, http::HttpResponse* resp)
 {
     // JSON 解析使用 try catch 捕获异常

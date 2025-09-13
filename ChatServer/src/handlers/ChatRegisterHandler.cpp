@@ -1,6 +1,5 @@
 #include "../include/handlers/ChatRegisterHandler.h"
 
-//ÒÑ¿´Íê
 
 void ChatRegisterHandler::handle(const http::HttpRequest& req, http::HttpResponse* resp)
 {

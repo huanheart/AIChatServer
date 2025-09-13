@@ -3,7 +3,6 @@
 #include "../ChatServer.h"
 #include "../../../HttpServer/include/utils/JsonUtil.h"
 
-//ÒÑ¿´Íê
 class ChatLogoutHandler : public http::router::RouterHandler
 {
 public:

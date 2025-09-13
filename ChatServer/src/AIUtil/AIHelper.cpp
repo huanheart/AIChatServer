@@ -1,5 +1,6 @@
 #include"../include/AIUtil/AIHelper.h"
 #include <stdexcept>
+#include<chrono>
 
 // 构造函数
 AIHelper::AIHelper(const std::string& apiKey)
@@ -12,16 +13,22 @@ void AIHelper::setModel(const std::string& modelName) {
 }
 
 // 添加一条用户消息
-void AIHelper::addUserMessage(const std::string& userInput) {
-    std::cout << "test userInput is " << userInput << std::endl;
-    messages.push_back(userInput);
-    // TODO: 在这里调用 pushMessageToMysql() 异步入库
-    pushMessageToMysql();
+void AIHelper::addMessage(int userId,const std::string& userName, bool is_user,const std::string& userInput ) {
+    auto now = std::chrono::system_clock::now();
+    auto duration = now.time_since_epoch();
+    auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
+    messages.push_back({ userInput,ms });
+    //消息队列异步入库
+    pushMessageToMysql(userId, userName, is_user, userInput,ms);
+}
+
+void AIHelper::restoreMessage(const std::string& userInput,long long ms) {
+    messages.push_back({ userInput,ms });
 }
 
 
 // 发送聊天消息
-std::string AIHelper::chat() {
+std::string AIHelper::chat(int userId,std::string userName) {
     // 构造 payload
     json payload;
     payload["model"] = model_;
@@ -31,11 +38,11 @@ std::string AIHelper::chat() {
         json msg;
         if (i % 2 == 0) { // 偶数下标：用户
             msg["role"] = "user";
-            msg["content"] = messages[i];
+            msg["content"] = messages[i].first;
         }
         else { // 奇数下标：AI
             msg["role"] = "assistant";
-            msg["content"] = messages[i];
+            msg["content"] = messages[i].first;
         }
         msgArray.push_back(msg);
     }
@@ -50,9 +57,8 @@ std::string AIHelper::chat() {
 
     if (response.contains("choices") && !response["choices"].empty()) {
         std::string answer = response["choices"][0]["message"]["content"];
-        messages.push_back(answer); // 保存 AI 回复
-        // TODO: 可在这里调用 pushMessageToMysql()
-        //pushMessageToMysql();
+        // 保存 AI 回复
+        addMessage(userId,userName, false,answer);
         return answer;
     }
 
@@ -110,6 +116,12 @@ size_t AIHelper::WriteCallback(void* contents, size_t size, size_t nmemb, void* 
     return totalSize;
 }
 
-void AIHelper::pushMessageToMysql() {
-
+void AIHelper::pushMessageToMysql(int userId, const std::string& userName, bool is_user, const std::string& userInput,long long ms) {
+    std::string sql = "INSERT INTO chat_message (id, username, is_user, content, ts) VALUES ("
+        + std::to_string(userId) + ", "  // 这里用 userId 作为 id，或者你自己生成
+        + "'" + userName + "', "
+        + std::to_string(is_user ? 1 : 0) + ", "
+        + "'" + userInput + "', "
+        + std::to_string(ms) + ")";
+    mysqlUtil_.executeUpdate(sql);
 }

@@ -131,136 +131,92 @@
         <div class="menu-border"></div>
         <div class="menu-option" id="chat-service">[1] 进入AI聊天助手</div>
         <div class="menu-option" id="image-service">[2] 进入AI图像识别助手</div>
-        <div class="menu-option" id="exit-game">[0] 退出登录</div>
+        <div class="menu-option" id="logout">[0] 退出登录</div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            console.log('Page loaded'); // 调试日志
-
             const progressBar = document.querySelector('.progress-bar-inner');
             const loadingContainer = document.getElementById('loading-container');
             const menuContainer = document.getElementById('menu-container');
 
-            if (!progressBar || !loadingContainer || !menuContainer) {
-                console.error('Required elements not found');
-                return;
-            }
-
-            // 强制触发重排以确保动画生效
+            // 设置进度条动画
             void progressBar.offsetWidth;
-
-            // 设置进度条
             progressBar.style.width = '100%';
 
-            // 监听过渡结束事件
             progressBar.addEventListener('transitionend', function () {
-                console.log('Progress bar animation completed');
                 loadingContainer.style.display = 'none';
                 menuContainer.style.display = 'block';
             });
 
-            // 添加超时保护
             setTimeout(() => {
                 if (loadingContainer.style.display !== 'none') {
-                    console.log('Timeout triggered - forcing menu display');
                     loadingContainer.style.display = 'none';
                     menuContainer.style.display = 'block';
                 }
-            }, 2000); // 2秒后强制显示菜单
+            }, 2000);
         });
 
         // 进入AI聊天服务
         function enterChatService() {
-            const userId = sessionStorage.getItem('userId');
-
-            fetch('/chat', {
-                method: 'GET',
-                headers: {
-                    'Accept': 'text/html'
-                }
-            })
-                .then(response => response.text())
-                .then(html => {
-                    // 完全清除当前页面
-                    document.open();
-                    document.write(html);
-                    document.close();
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('进入AI聊天服务异常！');
-                });
+            fetch('/chat', { method: 'GET', headers: { 'Accept': 'text/html' } })
+                .then(res => res.text())
+                .then(html => { document.open(); document.write(html); document.close(); })
+                .catch(() => alert('进入AI聊天服务异常！'));
         }
 
         // 进入AI图像识别服务
         function enterImageService() {
-            const userId = sessionStorage.getItem('userId');
+            fetch('/upload', { method: 'GET', headers: { 'Accept': 'text/html' } })
+                .then(res => res.text())
+                .then(html => { document.open(); document.write(html); document.close(); })
+                .catch(() => alert('进入AI图像识别服务异常！'));
+        }
 
-            fetch('/upload', {
-                method: 'GET',
-                headers: {
-                    'Accept': 'text/html'
-                }
+        // 退出登录
+        function exitGame() {
+            const userId = sessionStorage.getItem('userId');
+            fetch('/user/logout', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId: userId, type: 'manual', gameType: 0 })
             })
-                .then(response => response.text())
+                .then(res => {
+                    if (!res.ok) throw new Error('Logout failed');
+                    return fetch('/', { method: 'GET', headers: { 'Accept': 'text/html' } });
+                })
+                .then(res => res.text())
                 .then(html => {
-                    // 完全清除当前页面
+                    sessionStorage.clear(); // 清理本地用户信息
                     document.open();
                     document.write(html);
                     document.close();
                 })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('进入AI图像识别服务异常！');
-                });
+                .catch(() => alert('退出登录失败！'));
         }
 
         // 绑定点击事件
         document.getElementById('chat-service').addEventListener('click', enterChatService);
         document.getElementById('image-service').addEventListener('click', enterImageService);
+        document.getElementById('logout').addEventListener('click', exitGame);
 
-        // 添加页面刷新/关闭时的处理
-        window.addEventListener('beforeunload', function (e) {
+        // 页面刷新/关闭时自动登出
+        window.addEventListener('beforeunload', function () {
             const userId = sessionStorage.getItem('userId');
             if (userId) {
-                try {
-                    // 创建 Blob 对象，指定 content-type
-                    const data = new Blob([JSON.stringify({
-                        userId: userId,
-                        type: 'refresh',
-                        gameType: 0
-                    })], { type: 'application/json' });
-
-                    // 使用 navigator.sendBeacon 发送异步请求
-                    const success = navigator.sendBeacon('/user/logout', data);
-
-                    // 如果 sendBeacon 失败，尝试使用同步 XMLHttpRequest
-                    if (!success) {
-                        const xhr = new XMLHttpRequest();
-                        xhr.open('POST', '/user/logout', false); // 同步请求
-                        xhr.setRequestHeader('Content-Type', 'application/json');
-                        xhr.send(JSON.stringify({
-                            userId: userId,
-                            type: 'refresh',
-                            gameType: 0
-                        }));
-                    }
-                } catch (error) {
-                    console.error('Logout error:', error);
-                }
+                const data = new Blob([JSON.stringify({ userId: userId, type: 'refresh', gameType: 0 })],
+                    { type: 'application/json' });
+                navigator.sendBeacon('/user/logout', data);
             }
         });
 
-        // 添加页面加载时的用户检查
+        // 页面加载时用户检查
         window.addEventListener('load', function () {
             const userId = sessionStorage.getItem('userId');
             if (!userId) {
                 window.location.href = '/entry';
-                return;
             }
         });
     </script>
 </body>
-
 </html>

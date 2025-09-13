@@ -1,5 +1,5 @@
 #include "../include/handlers/ChatLogoutHandler.h"
-//已看完
+
 void ChatLogoutHandler::handle(const http::HttpRequest& req, http::HttpResponse* resp)
 {
     auto contentType = req.getHeader("Content-Type");
@@ -26,7 +26,6 @@ void ChatLogoutHandler::handle(const http::HttpRequest& req, http::HttpResponse*
         server_->getSessionManager()->destroySession(session->getId());
 
         json parsed = json::parse(req.getBody());
-        int chatType = parsed["chatType"]; // fixme: 以后也换成从会话中获取
 
         {   // 释放资源
             std::lock_guard<std::mutex> lock(server_->mutexForOnlineUsers_);

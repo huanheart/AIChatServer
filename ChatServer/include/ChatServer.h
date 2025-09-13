@@ -31,7 +31,6 @@ class AIMenuHandler;
 class AIUploadHandler;
 class AIUploadSendHandler;
 
-
 class ChatServer {
 public:
 	ChatServer(int port,
@@ -57,7 +56,9 @@ private:
 	void initializeSession();
 	void initializeRouter();
 	void initializeMiddleware();
+	void initChatMessage();
 
+	void readDataFromMySQL();
 
 	void packageResp(const std::string& version, http::HttpResponse::HttpStatusCode statusCode,
 		const std::string& statusMsg, bool close, const std::string& contentType,
