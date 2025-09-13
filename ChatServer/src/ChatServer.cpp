@@ -7,7 +7,6 @@
 #include"../include/handlers/AIMenuHandler.h"
 #include"../include/handlers/AIUploadSendHandler.h"
 #include"../include/handlers/AIUploadHandler.h"
-#include"../include/handlers/AIExitLoginHanndler.h"
 
 
 #include "../include/ChatServer.h"
@@ -29,6 +28,7 @@ ChatServer::ChatServer(int port,
 }
 
 void ChatServer::initialize() {
+    std::cout << "ChatServer initialize start  ! " << std::endl;
 	http::MysqlUtil::init("tcp://127.0.0.1:3306", "root", "123456", "ChatHttpServer", 10);
     // 初始化会话
     initializeSession();
@@ -38,41 +38,52 @@ void ChatServer::initialize() {
     initializeRouter();
     //初始化chat_message表到chatInformation中
     initChatMessage();
+    std::cout << "ChatServer initialize success ! " << std::endl;
 }
 
 void ChatServer::initChatMessage() {
     //遍历chat_message所有数据，将指定user_id对应消息放入到chatInformation中
+    std::cout << "initChatMessage start ! " << std::endl;
     readDataFromMySQL();
+    std::cout << "initChatMessage success ! " << std::endl;
 }
 
 void ChatServer::readDataFromMySQL() {
     //按照时间戳排序
     std::string sql = "SELECT id, username, is_user, content, ts FROM chat_message ORDER BY ts ASC, id ASC";
-    sql::ResultSet* res = mysqlUtil_.executeQuery(sql);
+    auto res = mysqlUtil_.executeQuery(sql);
+    const char* apiKey = std::getenv("DASHSCOPE_API_KEY");
+    if (!apiKey) {
+        std::cerr << "Error: DASHSCOPE_API_KEY not found in environment!" << std::endl;
+        return;
+    }
 
-    while (res->next()) {
-        std::string username = res->getString("username");
+    while (res.next()) {
+        std::string username = res.getString("username");
+        
         /*
             这里不太需要根据is_user进行插入, 默认在聊天的时候就是一问一答的，默认问的时间永远在答的前面
             且默认一定是有偶数个消息在message中，暂且不做太多健壮性考虑
             bool is_user = res->getInt("is_user") != 0; 
         */
-        std::string content = res->getString("content");
-        long long ts = res->getInt64("ts");
-        long long user_id = res->getInt64("id");
+        std::string content = res.getString("content");
+        long long ts = res.getInt64("ts");
+        long long user_id = res.getInt64("id");
 
         // 找到或创建对应的 AIHelper
         std::shared_ptr<AIHelper> helper;
         auto it = chatInformation.find(user_id);
         if (it == chatInformation.end()) {
-            helper = std::make_shared<AIHelper>();
+            helper = std::make_shared<AIHelper>(apiKey);
             chatInformation[user_id] = helper;
         }else {
             helper = it->second;
         }
-        // 添加消息
-        helper->addMessage(content,ts);
+        std::cout << user_id << ' ' << username << ' ' << content << ' ' << ts << std::endl;
+        // 恢复消息
+        helper->restoreMessage(content,ts);
     }
+
 }
 
 

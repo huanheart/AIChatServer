@@ -51,10 +51,10 @@ int ChatRegisterHandler::insertUser(const std::string& username, const std::stri
         std::string sql = "INSERT INTO users (username, password) VALUES ('" + username + "', '" + password + "')";
         mysqlUtil_.executeUpdate(sql);
         std::string sql2 = "SELECT id FROM users WHERE username = '" + username + "'";
-        sql::ResultSet* res = mysqlUtil_.executeQuery(sql2);
-        if (res->next())
+        auto res = mysqlUtil_.executeQuery(sql2);
+        if (res.next())
         {
-            return res->getInt("id");
+            return res.getInt("id");
         }
     }
     return -1;
@@ -63,8 +63,8 @@ int ChatRegisterHandler::insertUser(const std::string& username, const std::stri
 bool ChatRegisterHandler::isUserExist(const std::string& username)
 {
     std::string sql = "SELECT id FROM users WHERE username = '" + username + "'";
-    sql::ResultSet* res = mysqlUtil_.executeQuery(sql);
-    if (res->next())
+    auto res = mysqlUtil_.executeQuery(sql);
+    if (res.next())
     {
         return true;
     }
