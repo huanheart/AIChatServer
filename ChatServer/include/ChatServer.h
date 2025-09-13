@@ -39,7 +39,7 @@ public:
 
 	void setThreadNum(int numThreads);
 	void start();
-
+	void initChatMessage();
 private:
 	friend class ChatLoginHandler;
 	friend class ChatRegisterHandler;
@@ -56,7 +56,7 @@ private:
 	void initializeSession();
 	void initializeRouter();
 	void initializeMiddleware();
-	void initChatMessage();
+	
 
 	void readDataFromMySQL();
 
