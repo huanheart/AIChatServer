@@ -12,17 +12,19 @@ void MQManager::publish(const std::string& queue, const std::string& msg) {
 
 void RabbitMQThreadPool::worker(int id){
     try {
-        auto channel = AmqpClient::Channel::Create(rabbitmq_host_);
+        //auto channel = AmqpClient::Channel::Create(rabbitmq_host_);
+        auto channel=AmqpClient::Channel::Open(rabbitmq_host_, 5672, "guest", "guest", "/");
         channel->DeclareQueue(queue_name_, false, true, false, false);
-        channel->BasicQos(1); // 每个线程一次只处理一条消息
         std::string consumer_tag = channel->BasicConsume(queue_name_, "");
+        channel->BasicQos(consumer_tag,1); // 每个线程一次只处理一条消息
+        
 
         while (!stop_) {
             AmqpClient::Envelope::ptr_t env;
             bool ok = channel->BasicConsumeMessage(consumer_tag, env, 500); // 500ms 超时
             if (ok && env) {
                 std::string msg = env->Message()->Body();
-                handler(msg);
+                handler_(msg);
                 channel->BasicAck(env);
             }
         }

@@ -28,7 +28,8 @@ private:
     MQManager(size_t poolSize = 5) : poolSize_(poolSize), counter_(0) {
         for (size_t i = 0; i < poolSize_; ++i) {
             auto conn = std::make_shared<MQConn>();
-            conn->channel = AmqpClient::Channel::Create("localhost");
+            //conn->channel = AmqpClient::Channel::Create("localhost");
+            conn->channel = AmqpClient::Channel::Open(rabbitmq_host_, 5672, "guest", "guest", "/");
             conn->channel->DeclareQueue("sql_queue", false, true, false, false);
             pool_.push_back(conn);
         }
@@ -44,13 +45,6 @@ private:
 
 
 class RabbitMQThreadPool {
-private:
-    std::vector<std::thread> workers_;
-    std::atomic<bool> stop_;
-    std::string queue_name_;
-    int thread_num_;
-    std::string rabbitmq_host_;
-    void worker(int id);
 
 public:
     using HandlerFunc = std::function<void(const std::string&)>;
@@ -65,5 +59,12 @@ public:
     ~RabbitMQThreadPool() {
         shutdown();
     }
-
+private:
+    std::vector<std::thread> workers_;
+    std::atomic<bool> stop_;
+    std::string queue_name_;
+    int thread_num_;
+    std::string rabbitmq_host_;
+    void worker(int id);
+    HandlerFunc handler_;
 };
