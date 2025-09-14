@@ -53,11 +53,7 @@ void AIUploadSendHandler::handle(const http::HttpRequest& req, http::HttpRespons
         std::string decodedData = base64_decode(imageBase64);
         std::vector<uchar> imgData(decodedData.begin(), decodedData.end());
         //开始进行识别
-        int predClass = ImageRecognizerPtr->PredictFromBuffer(imgData);
-
-        // TODO: 这里你应该有个类别表，比如 ImageNet 的 label
-        // 我先用简单字符串代替
-        std::string className = "class_" + std::to_string(predClass);
+        std::string className = ImageRecognizerPtr->PredictFromBuffer(imgData);
 
         // 4. 构造响应
         json successResp;
