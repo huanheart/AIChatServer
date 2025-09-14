@@ -8,7 +8,7 @@
 #include <thread>
 #include <iostream>
 #include <chrono>
-
+#include <functional>
 
 class MQManager {
 public:
@@ -25,15 +25,7 @@ private:
         std::mutex mtx;
     };
 
-    MQManager(size_t poolSize = 5) : poolSize_(poolSize), counter_(0) {
-        for (size_t i = 0; i < poolSize_; ++i) {
-            auto conn = std::make_shared<MQConn>();
-            //conn->channel = AmqpClient::Channel::Create("localhost");
-            conn->channel = AmqpClient::Channel::Open(rabbitmq_host_, 5672, "guest", "guest", "/");
-            conn->channel->DeclareQueue("sql_queue", false, true, false, false);
-            pool_.push_back(conn);
-        }
-    }
+    MQManager(size_t poolSize = 5);
 
     MQManager(const MQManager&) = delete;
     MQManager& operator=(const MQManager&) = delete;
@@ -43,28 +35,35 @@ private:
     std::atomic<size_t> counter_;
 };
 
-
 class RabbitMQThreadPool {
-
 public:
     using HandlerFunc = std::function<void(const std::string&)>;
 
-    RabbitMQThreadPool(const std::string& host,const std::string& queue,int thread_num,HandlerFunc handler)
-                        : stop_(false), rabbitmq_host_(host), queue_name_(queue),
-                        thread_num_(thread_num), handler_(handler) {}
+    RabbitMQThreadPool(const std::string& host,
+        const std::string& queue,
+        int thread_num,
+        HandlerFunc handler)
+        : stop_(false),
+        rabbitmq_host_(host),
+        queue_name_(queue),
+        thread_num_(thread_num),
+        handler_(handler) {}
 
     void start();
-    void shutdown(); 
+    void shutdown();
 
     ~RabbitMQThreadPool() {
         shutdown();
     }
+
+private:
+    void worker(int id);
+
 private:
     std::vector<std::thread> workers_;
     std::atomic<bool> stop_;
     std::string queue_name_;
     int thread_num_;
     std::string rabbitmq_host_;
-    void worker(int id);
     HandlerFunc handler_;
 };
