@@ -54,5 +54,5 @@ private:
     //后者代表时间戳
     std::vector<std::pair<std::string, long long>> messages;
 
-    http::MysqlUtil mysqlUtil_;
+    //http::MysqlUtil mysqlUtil_;
 };

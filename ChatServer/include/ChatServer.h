@@ -19,6 +19,8 @@
 #include"AIUtil/AIHelper.h"
 #include"AIUtil/ImageRecognizer.h"
 #include"AIUtil/base64.h"
+#include"AIUtil/MQManager.h"
+
 
 class ChatLoginHandler;
 class ChatRegisterHandler;

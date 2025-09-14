@@ -1,4 +1,5 @@
 #include"../include/AIUtil/AIHelper.h"
+#include"../include/AIUtil/MQManager.h"
 #include <stdexcept>
 #include<chrono>
 
@@ -123,5 +124,8 @@ void AIHelper::pushMessageToMysql(int userId, const std::string& userName, bool 
         + std::to_string(is_user ? 1 : 0) + ", "
         + "'" + userInput + "', "
         + std::to_string(ms) + ")";
-    mysqlUtil_.executeUpdate(sql);
+    //改成消息队列异步执行mysql操作，用于流量削峰与解耦逻辑
+    //mysqlUtil_.executeUpdate(sql);
+
+    MQManager::instance().publish("sql_queue", sql);
 }
