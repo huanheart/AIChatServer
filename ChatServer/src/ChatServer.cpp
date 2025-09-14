@@ -7,7 +7,7 @@
 #include"../include/handlers/AIMenuHandler.h"
 #include"../include/handlers/AIUploadSendHandler.h"
 #include"../include/handlers/AIUploadHandler.h"
-#include"../include/handlers/ChatHistoryHandler.H"
+#include"../include/handlers/ChatHistoryHandler.h"
 
 #include "../include/ChatServer.h"
 #include "../../../HttpServer/include/http/HttpRequest.h"
