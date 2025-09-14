@@ -7,7 +7,7 @@
 #include"../include/handlers/AIMenuHandler.h"
 #include"../include/handlers/AIUploadSendHandler.h"
 #include"../include/handlers/AIUploadHandler.h"
-
+#include"../include/handlers/ChatHistoryHandler.H"
 
 #include "../include/ChatServer.h"
 #include "../../../HttpServer/include/http/HttpRequest.h"
@@ -137,6 +137,9 @@ void ChatServer::initializeRouter() {
     httpServer_.Get("/upload", std::make_shared<AIUploadHandler>(this));
     //上传请求
     httpServer_.Post("/upload/send", std::make_shared<AIUploadSendHandler>(this));
+    //同步历史数据（将上一次登录的数据返回给前端渲染）
+    httpServer_.Post("/chat/history", std::make_shared<ChatHistoryHandler>(this));
+
 
 }
 

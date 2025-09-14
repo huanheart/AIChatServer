@@ -28,10 +28,13 @@ class ChatLogoutHandler;
 class ChatHandler;
 class ChatEntryHandler;
 class ChatSendHandler;
+class ChatHistoryHandler;
 
 class AIMenuHandler;
 class AIUploadHandler;
 class AIUploadSendHandler;
+
+
 
 class ChatServer {
 public:
@@ -52,6 +55,7 @@ private:
 	friend class AIMenuHandler;
 	friend class AIUploadHandler;
 	friend class AIUploadSendHandler;
+	friend class ChatHistoryHandler;
 
 private:
 	void initialize();

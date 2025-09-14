@@ -32,6 +32,8 @@ public:
     // 可选：发送自定义请求体
     json request(const json& payload);
 
+    std::vector<std::pair<std::string, long long>> GetMessages();
+
 private:
     //加入到mysql的接口（提供加入到线程池的接口，线程池做异步mysql更新操作）
     //todo: 

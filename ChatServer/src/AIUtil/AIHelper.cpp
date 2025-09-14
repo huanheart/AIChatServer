@@ -71,6 +71,11 @@ json AIHelper::request(const json& payload) {
     return executeCurl(payload);
 }
 
+std::vector<std::pair<std::string, long long>> AIHelper::GetMessages() {
+    return this->messages;
+}
+
+
 // 内部方法：执行 curl 请求
 json AIHelper::executeCurl(const json& payload) {
     CURL* curl = curl_easy_init();
