@@ -92,7 +92,7 @@ bool ChatRegisterHandler::isUserExist(const std::string& username)
 {
     std::string sql = "SELECT id FROM users WHERE username = '" + username + "'";
     auto res = mysqlUtil_.executeQuery(sql);
-    if (res.next())
+    if (res->next())
     {
         return true;
     }
