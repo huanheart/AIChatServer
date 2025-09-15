@@ -115,9 +115,9 @@ int ChatLoginHandler::queryUserId(const std::string& username, const std::string
     std::string sql = "SELECT id FROM users WHERE username = ? AND password = ?";
     // std::vector<std::string> params = {username, password};
     auto res = mysqlUtil_.executeQuery(sql, username, password);
-    if (res.next())
+    if (res->next())
     {
-        int id = res.getInt("id");
+        int id = res->getInt("id");
         return id;
     }
     // 如果查询结果为空，则返回-1

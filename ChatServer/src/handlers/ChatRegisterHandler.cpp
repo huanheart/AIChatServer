@@ -80,9 +80,9 @@ int ChatRegisterHandler::insertUser(const std::string& username, const std::stri
             }
         }
         */
-        if (res.next())
+        if (res->next())
         {
-            return res.getInt("id");
+            return res->getInt("id");
         }
     }
     return -1;

@@ -57,7 +57,7 @@ void ChatServer::readDataFromMySQL() {
     // SQL ²éÑ¯
     std::string sql = "SELECT id, username, is_user, content, ts FROM chat_message ORDER BY ts ASC, id ASC";
 
-    http::db::QueryResult res;
+    sql::ResultSet* res;
     try {
         res = mysqlUtil_.executeQuery(sql);
     }
@@ -66,18 +66,18 @@ void ChatServer::readDataFromMySQL() {
         return;
     }
 
-    while (res.next()) {
+    while (res->next()) {
         long long user_id = 0;
         std::string username, content;
         long long ts = 0;
         int is_user = 1;
 
         try {
-            user_id = res.getInt64("id");
-            username = res.getString("username");
-            content = res.getString("content");
-            ts = res.getInt64("ts");
-            is_user = res.getInt("is_user");
+            user_id = res->getInt64("id");
+            username = res->getString("username");
+            content = res->getString("content");
+            ts = res->getInt64("ts");
+            is_user = res->getInt("is_user");
         }
         catch (const std::exception& e) {
             std::cerr << "Failed to read row: " << e.what() << std::endl;
