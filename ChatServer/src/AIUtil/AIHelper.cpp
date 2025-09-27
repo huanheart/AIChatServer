@@ -57,7 +57,7 @@ std::string AIHelper::chat(int userId,std::string userName) {
     payload["messages"] = msgArray;
 
     // 打印 payload（缩进 4 个空格）
-    std::cout << "[DEBUG] payload = " << payload.dump(4) << std::endl;
+    //std::cout << "[DEBUG] payload = " << payload.dump(4) << std::endl;
 
     // 执行请求
     json response = executeCurl(payload);
@@ -89,6 +89,8 @@ json AIHelper::executeCurl(const json& payload) {
         throw std::runtime_error("Failed to initialize curl");
     }
 
+    std::cout<<"test "<< strategy->getApiUrl().c_str()<<' '<< strategy->getApiKey()<<std::endl;
+
     std::string readBuffer;
     struct curl_slist* headers = nullptr;
     std::string authHeader = "Authorization: Bearer " + strategy->getApiKey();
@@ -97,7 +99,8 @@ json AIHelper::executeCurl(const json& payload) {
     headers = curl_slist_append(headers, "Content-Type: application/json");
 
     std::string payloadStr = payload.dump();
-    std::cout << "test json->payloadStr " << payloadStr << std::endl;
+
+
     curl_easy_setopt(curl, CURLOPT_URL, strategy->getApiUrl().c_str());
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, payloadStr.c_str());

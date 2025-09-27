@@ -27,13 +27,15 @@ void ChatSendHandler::handle(const http::HttpRequest& req, http::HttpResponse* r
         std::string username = session->getValue("username");
 
         std::string userQuestion;
+        std::string modelType;
         auto body = req.getBody();
         if (!body.empty()) {
             auto j = json::parse(body);
             if (j.contains("question")) userQuestion = j["question"];
+            // 默认阿里
+            modelType = j.contains("modelType") ? j["modelType"].get<std::string>() : "1";
         }
-        // 默认阿里
-        std::string modelType = j.contains("modelType") ? j["modelType"].get<std::string>() : "1";
+
 
         std::shared_ptr<AIHelper> AIHelperPtr;
         {
