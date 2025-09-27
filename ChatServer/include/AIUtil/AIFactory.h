@@ -4,6 +4,11 @@
 #include <utility>
 #include <iostream>
 #include <sstream>
+#include <memory>
+#include <functional>
+#include <unordered_map>
+#include <string>
+
 
 #include"AIStrategy.h"
 

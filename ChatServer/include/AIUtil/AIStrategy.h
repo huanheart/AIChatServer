@@ -4,6 +4,7 @@
 #include <utility>
 #include <iostream>
 #include <sstream>
+#include <memory>
 
 // ²ßÂÔ½Ó¿Ú
 class AIStrategy {
@@ -32,9 +33,10 @@ public:
         apiKey_ = key;
     }
 
-    std::string getApiUrl() override;
-    std::string getApiKey() override;
-    std::string getModel() override;
+    std::string getApiUrl() const override;
+    std::string getApiKey() const override;
+    std::string getModel() const override;
+
 private:
     std::string apiKey_;
 };
@@ -47,9 +49,10 @@ public:
         if (!key) throw std::runtime_error("DOUBAO API Key not found!");
         apiKey_ = key;
     }
-    std::string getApiUrl() override;
-    std::string getApiKey() override;
-    std::string getModel() override;
+    std::string getApiUrl() const override;
+    std::string getApiKey() const override;
+    std::string getModel() const override;
+
 
 private:
     std::string apiKey_;

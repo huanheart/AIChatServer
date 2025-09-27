@@ -25,6 +25,13 @@ void ChatSendHandler::handle(const http::HttpRequest& req, http::HttpResponse* r
         // 获取用户信息以及获取用户对应的表数据
         int userId = std::stoi(session->getValue("userId"));
         std::string username = session->getValue("username");
+
+        std::string userQuestion;
+        auto body = req.getBody();
+        if (!body.empty()) {
+            auto j = json::parse(body);
+            if (j.contains("question")) userQuestion = j["question"];
+        }
         // 默认阿里
         std::string modelType = j.contains("modelType") ? j["modelType"].get<std::string>() : "1";
 
@@ -35,7 +42,7 @@ void ChatSendHandler::handle(const http::HttpRequest& req, http::HttpResponse* r
                 // 插入一个新的 AIHelper
                 server_->chatInformation.emplace(
                     userId,
-                    std::make_shared<AIHelper>();
+                    std::make_shared<AIHelper>()
                 );
             }
             AIHelperPtr= server_->chatInformation[userId];
@@ -44,12 +51,7 @@ void ChatSendHandler::handle(const http::HttpRequest& req, http::HttpResponse* r
         //设置成用户想要的策略
         AIHelperPtr->setStrategy(StrategyFactory::instance().create(modelType));
 
-        std::string userQuestion;
-        auto body = req.getBody();
-        if (!body.empty()) {
-            auto j = json::parse(body);
-            if (j.contains("question")) userQuestion = j["question"];
-        }
+
         //int userId, const std::string& userName, bool is_user, const std::string& userInput
         AIHelperPtr->addMessage(userId, username,true,userQuestion);
 
