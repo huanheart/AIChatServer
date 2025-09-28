@@ -65,7 +65,7 @@ void ChatServer::readDataFromMySQL() {
 
     while (res->next()) {
         long long user_id = 0;
-        std::string session_id = 0;   // 新增：会话ID
+        std::string session_id ;   // 新增：会话ID
         std::string username, content;
         long long ts = 0;
         int is_user = 1;
