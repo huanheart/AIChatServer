@@ -13,5 +13,5 @@ public:
         std::srand(static_cast<unsigned>(std::time(nullptr)));
     }
     //利用时间戳生成一个id
-    long long generate();
+    std::string generate();
 };

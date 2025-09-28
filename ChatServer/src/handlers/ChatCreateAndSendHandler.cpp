@@ -55,8 +55,10 @@ void ChatCreateAndSendHandler::handle(const http::HttpRequest& req, http::HttpRe
                     sessionId,
                     std::make_shared<AIHelper>()
                 );
+                server_->sessionsIdsMap[userId].push_back(sessionId);
             }
             AIHelperPtr= userSessions[sessionId];
+
         }
         
         //设置成用户想要的策略

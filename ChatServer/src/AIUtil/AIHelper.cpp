@@ -149,7 +149,7 @@ std::string AIHelper::escapeString(const std::string& input) {
 }
 
 
-void AIHelper::pushMessageToMysql(int userId, const std::string& userName, bool is_user, const std::string& userInput,long long ms, long long sessionId) {
+void AIHelper::pushMessageToMysql(int userId, const std::string& userName, bool is_user, const std::string& userInput,long long ms, std::string sessionId) {
     // std::string sql = "INSERT INTO chat_message (id, username, is_user, content, ts) VALUES ("
     //     + std::to_string(userId) + ", "  // 这里用 userId 作为 id，或者你自己生成
     //     + "'" + userName + "', "
@@ -162,7 +162,7 @@ void AIHelper::pushMessageToMysql(int userId, const std::string& userName, bool 
     std::string sql = "INSERT INTO chat_message (id, username, session_id, is_user, content, ts) VALUES ("
         + std::to_string(userId) + ", "
         + "'" + safeUserName + "', "
-        + std::to_string(sessionId) + ", "
+        + sessionId + ", "
         + std::to_string(is_user ? 1 : 0) + ", "
         + "'" + safeUserInput + "', "
         + std::to_string(ms) + ")";

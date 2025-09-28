@@ -41,7 +41,7 @@ void ChatSessionsHandler::handle(const http::HttpRequest& req, http::HttpRespons
         for (auto sid : sessions) {
             json s;
             s["sessionId"] = sid;
-            s["name"] = "会话 " + std::to_string(sid);
+            s["name"] = "会话 " + sid;
             sessionArray.push_back(s);
         }
         successResp["sessions"] = sessionArray;
