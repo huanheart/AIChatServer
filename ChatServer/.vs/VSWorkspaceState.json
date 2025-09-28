@@ -1,0 +1,12 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\include",
+    "\\include\\AIUtil",
+    "\\include\\handlers",
+    "\\src",
+    "\\src\\handlers"
+  ],
+  "SelectedNode": "\\src\\handlers\\ChatCreateAndSendHandler.cpp",
+  "PreviewInSolutionExplorer": false
+}

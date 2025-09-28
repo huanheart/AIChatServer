@@ -28,10 +28,13 @@ void ChatSendHandler::handle(const http::HttpRequest& req, http::HttpResponse* r
 
         std::string userQuestion;
         std::string modelType;
+        std::string sessionId;
+
         auto body = req.getBody();
         if (!body.empty()) {
             auto j = json::parse(body);
             if (j.contains("question")) userQuestion = j["question"];
+            if (j.contains("sessionId")) sessionId = j["sessionId"];
             // 默认阿里
             modelType = j.contains("modelType") ? j["modelType"].get<std::string>() : "1";
         }
@@ -40,24 +43,27 @@ void ChatSendHandler::handle(const http::HttpRequest& req, http::HttpResponse* r
         std::shared_ptr<AIHelper> AIHelperPtr;
         {
             std::lock_guard<std::mutex> lock(server_->mutexForChatInformation);
-            if (server_->chatInformation.find(userId) == server_->chatInformation.end()) {
+
+            auto& userSessions = server_->chatInformation[userId];
+
+            if (userSessions.find(sessionId) == userSessions.end()) {
                 // 插入一个新的 AIHelper
-                server_->chatInformation.emplace(
-                    userId,
+                userSessions.emplace( 
+                    sessionId,
                     std::make_shared<AIHelper>()
                 );
             }
-            AIHelperPtr= server_->chatInformation[userId];
+            AIHelperPtr= userSessions[sessionId];
         }
         
         //设置成用户想要的策略
         AIHelperPtr->setStrategy(StrategyFactory::instance().create(modelType));
 
 
-        //int userId, const std::string& userName, bool is_user, const std::string& userInput
-        AIHelperPtr->addMessage(userId, username,true,userQuestion);
+        //int userId, const std::string& userName, bool is_user, const std::string& userInput,std::string sessionId;
+        AIHelperPtr->addMessage(userId, username,true,userQuestion,sessionId);
 
-        std::string aiInformation=AIHelperPtr->chat(userId, username);
+        std::string aiInformation=AIHelperPtr->chat(userId, username,sessionId);
         json successResp;
         successResp["success"] = true;
         successResp["Information"] = aiInformation;

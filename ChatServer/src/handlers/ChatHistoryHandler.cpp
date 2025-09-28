@@ -24,20 +24,33 @@ void ChatHistoryHandler::handle(const http::HttpRequest& req, http::HttpResponse
         // 获取用户信息以及获取用户对应的表数据
         int userId = std::stoi(session->getValue("userId"));
         std::string username = session->getValue("username");
+
+        std::string sessionId;
+        auto body = req.getBody();
+        if (!body.empty()) {
+            auto j = json::parse(body);
+            if (j.contains("sessionId")) sessionId = j["sessionId"];
+        }
+
         std::vector<std::pair<std::string, long long>> messages;
+
         {
             std::shared_ptr<AIHelper> AIHelperPtr;
             std::lock_guard<std::mutex> lock(server_->mutexForChatInformation);
-            if (server_->chatInformation.find(userId) == server_->chatInformation.end()) {
+
+            auto& userSessions = server_->chatInformation[userId];
+
+            if (userSessions.find(sessionId) == userSessions.end()) {
                 // 插入一个新的 AIHelper
-                server_->chatInformation.emplace(
-                    userId,
+                userSessions.emplace( 
+                    sessionId,
                     std::make_shared<AIHelper>()
                 );
             }
-            AIHelperPtr = server_->chatInformation[userId];
+            AIHelperPtr= userSessions[sessionId];
             messages= AIHelperPtr->GetMessages();
         }
+
         //start
         json successResp;
         successResp["success"] = true;

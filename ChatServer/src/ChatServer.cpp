@@ -9,6 +9,10 @@
 #include"../include/handlers/AIUploadHandler.h"
 #include"../include/handlers/ChatHistoryHandler.h"
 
+
+#include"../include/handlers/ChatCreateAndSendHandler.h"
+#include"../include/handlers/ChatSessionsHandler.h"
+
 #include "../include/ChatServer.h"
 #include "../../../HttpServer/include/http/HttpRequest.h"
 #include "../../../HttpServer/include/http/HttpResponse.h"
@@ -46,11 +50,9 @@ void ChatServer::initChatMessage() {
 }
 
 void ChatServer::readDataFromMySQL() {
-    
-    
 
     // SQL 查询
-    std::string sql = "SELECT id, username, is_user, content, ts FROM chat_message ORDER BY ts ASC, id ASC";
+    std::string sql = "SELECT id, username,session_id, is_user, content, ts FROM chat_message ORDER BY ts ASC, id ASC";
 
     sql::ResultSet* res;
     try {
@@ -63,40 +65,43 @@ void ChatServer::readDataFromMySQL() {
 
     while (res->next()) {
         long long user_id = 0;
+        std::string session_id = 0;   // 新增：会话ID
         std::string username, content;
         long long ts = 0;
         int is_user = 1;
 
         try {
-            user_id = res->getInt64("id");
-            username = res->getString("username");
-            content = res->getString("content");
-            ts = res->getInt64("ts");
-            is_user = res->getInt("is_user");
+            user_id    = res->getInt64("id");          // 用户ID
+            session_id = res->getString("session_id");  // 会话ID
+            username   = res->getString("username");
+            content    = res->getString("content");
+            ts         = res->getInt64("ts");
+            is_user    = res->getInt("is_user");
         }
         catch (const std::exception& e) {
             std::cerr << "Failed to read row: " << e.what() << std::endl;
             continue; // 跳过异常行
         }
 
-        // 找到或创建 AIHelper
+        auto& userSessions = chatInformation[user_id];
+
         std::shared_ptr<AIHelper> helper;
-        auto it = chatInformation.find(user_id);
-        if (it == chatInformation.end()) {
+        auto itSession = userSessions.find(session_id);
+        if (itSession == userSessions.end()) {
             helper = std::make_shared<AIHelper>();
-            chatInformation[user_id] = helper;
+            userSessions[session_id] = helper;
+        } else {
+            helper = itSession->second;
         }
-        else {
-            helper = it->second;
-        }
+        
+        // 记录会话ID,为每个用户登录聊天页面可展示所有会话
+        sessionsIdsMap[user_id].push_back(session_id);
 
         // 恢复消息
         helper->restoreMessage(content, ts);
     }
 
     std::cout << "readDataFromMySQL finished" << std::endl;
-
-     
 }
 
 
@@ -135,7 +140,9 @@ void ChatServer::initializeRouter() {
     //同步历史数据（将上一次登录的数据返回给前端渲染）
     httpServer_.Post("/chat/history", std::make_shared<ChatHistoryHandler>(this));
 
-
+    //第二阶段新增
+    httpServer_.Post("/chat/send-new-session", std::make_shared<ChatCreateAndSendHandler>(this));
+    httpServer_.Get("/chat/sessions", std::make_shared<ChatSessionsHandler>(this));
 }
 
 void ChatServer::initializeSession() {

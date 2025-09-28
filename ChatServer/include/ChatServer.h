@@ -34,6 +34,9 @@ class AIMenuHandler;
 class AIUploadHandler;
 class AIUploadSendHandler;
 
+//第二阶段
+class ChatCreateAndSendHandler;
+class ChatSessionsHandler;
 
 
 class ChatServer {
@@ -56,6 +59,10 @@ private:
 	friend class AIUploadHandler;
 	friend class AIUploadSendHandler;
 	friend class ChatHistoryHandler;
+	//第二阶段新增
+	friend class ChatCreateAndSendHandler;
+	friend class ChatSessionsHandler;
+
 
 private:
 	void initialize();
@@ -89,10 +96,18 @@ private:
 	//注意：存放指针是因为后续需要对chatInformation[key]进行更改
 	//若直接存放对象，不存放指针，那么由于unordered_map不是线程安全的，需要加锁对其
 	//里面的vector进行插入操作，那么用户A访问AI的操作就会严重影响到用户B
-	std::unordered_map<int, std::shared_ptr<AIHelper>> chatInformation;
+	
+	//一个用户只能有一个对话
+	// std::unordered_map<int, std::shared_ptr<AIHelper>> chatInformation;
+	//更改成单用户多对话形式
+	std::unordered_map<int, std::unordered_map<std::string,std::shared_ptr<AIHelper> > > chatInformation;
 	std::mutex	mutexForChatInformation;
 
 	std::unordered_map<int, std::shared_ptr<ImageRecognizer> > ImageRecognizerMap;
 	std::mutex	mutexForImageRecognizerMap;
+
+	std::unordered_map<int,std::vector<std::string> > sessionsIdsMap;
+	std::mutex mutexForSessionsId;
+
 };
 

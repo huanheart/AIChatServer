@@ -20,13 +20,13 @@ void AIHelper::setStrategy(std::shared_ptr<AIStrategy> strat) {
 //}
 
 // 添加一条用户消息
-void AIHelper::addMessage(int userId,const std::string& userName, bool is_user,const std::string& userInput ) {
+void AIHelper::addMessage(int userId,const std::string& userName, bool is_user,const std::string& userInput, std::string sessionId) {
     auto now = std::chrono::system_clock::now();
     auto duration = now.time_since_epoch();
     auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
     messages.push_back({ userInput,ms });
     //消息队列异步入库
-    pushMessageToMysql(userId, userName, is_user, userInput,ms);
+    pushMessageToMysql(userId, userName, is_user, userInput,ms,sessionId);
 }
 
 void AIHelper::restoreMessage(const std::string& userInput,long long ms) {
@@ -35,7 +35,7 @@ void AIHelper::restoreMessage(const std::string& userInput,long long ms) {
 
 
 // 发送聊天消息
-std::string AIHelper::chat(int userId,std::string userName) {
+std::string AIHelper::chat(int userId,std::string userName, std::string sessionId) {
     // 构造 payload
     json payload;
     payload["model"] = strategy->getModel();
@@ -65,7 +65,7 @@ std::string AIHelper::chat(int userId,std::string userName) {
     if (response.contains("choices") && !response["choices"].empty()) {
         std::string answer = response["choices"][0]["message"]["content"];
         // 保存 AI 回复
-        addMessage(userId,userName, false,answer);
+        addMessage(userId,userName, false,answer,sessionId);
         return answer;
     }
 
@@ -149,7 +149,7 @@ std::string AIHelper::escapeString(const std::string& input) {
 }
 
 
-void AIHelper::pushMessageToMysql(int userId, const std::string& userName, bool is_user, const std::string& userInput,long long ms) {
+void AIHelper::pushMessageToMysql(int userId, const std::string& userName, bool is_user, const std::string& userInput,long long ms, long long sessionId) {
     // std::string sql = "INSERT INTO chat_message (id, username, is_user, content, ts) VALUES ("
     //     + std::to_string(userId) + ", "  // 这里用 userId 作为 id，或者你自己生成
     //     + "'" + userName + "', "
@@ -159,12 +159,14 @@ void AIHelper::pushMessageToMysql(int userId, const std::string& userName, bool 
     std::string safeUserName = escapeString(userName);
     std::string safeUserInput = escapeString(userInput);
 
-    std::string sql = "INSERT INTO chat_message (id, username, is_user, content, ts) VALUES ("
+    std::string sql = "INSERT INTO chat_message (id, username, session_id, is_user, content, ts) VALUES ("
         + std::to_string(userId) + ", "
         + "'" + safeUserName + "', "
+        + std::to_string(sessionId) + ", "
         + std::to_string(is_user ? 1 : 0) + ", "
         + "'" + safeUserInput + "', "
         + std::to_string(ms) + ")";
+
     //改成消息队列异步执行mysql操作，用于流量削峰与解耦逻辑
     //mysqlUtil_.executeUpdate(sql);
 
