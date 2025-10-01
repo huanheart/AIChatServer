@@ -12,6 +12,7 @@
 
 #include"../include/handlers/ChatCreateAndSendHandler.h"
 #include"../include/handlers/ChatSessionsHandler.h"
+#include"../include/handlers/ChatSpeechHandler.h"
 
 #include "../include/ChatServer.h"
 #include "../../../HttpServer/include/http/HttpRequest.h"

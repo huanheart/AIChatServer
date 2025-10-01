@@ -16,6 +16,7 @@
 #include "../../../HttpServer/include/utils/MysqlUtil.h"
 #include "../../../HttpServer/include/utils/FileUtil.h"
 #include "../../../HttpServer/include/utils/JsonUtil.h"
+#include"AIUtil/AISpeechProcessor.h"
 #include"AIUtil/AIHelper.h"
 #include"AIUtil/ImageRecognizer.h"
 #include"AIUtil/base64.h"
@@ -37,7 +38,7 @@ class AIUploadSendHandler;
 //第二阶段
 class ChatCreateAndSendHandler;
 class ChatSessionsHandler;
-
+class ChatSpeechHandler;
 
 class ChatServer {
 public:
@@ -62,7 +63,7 @@ private:
 	//第二阶段新增
 	friend class ChatCreateAndSendHandler;
 	friend class ChatSessionsHandler;
-
+	friend class ChatSpeechHandler;
 
 private:
 	void initialize();
