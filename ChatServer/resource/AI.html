@@ -136,6 +136,19 @@
             padding: 6px;
             font-size: 14px;
         }
+        /* 语音按钮样式 */
+        .tts-btn {
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            background: #28a745;
+            color: white;
+            border: none;
+        }
+        .tts-btn:hover {
+            background: #1e7e34;
+        }
     </style>
 
     <!-- 引入 marked 和 DOMPurify -->
@@ -158,6 +171,7 @@
             <select id="modelType">
                 <option value="1" selected>阿里百炼</option>
                 <option value="2">豆包</option>
+                <option value="3">百炼RAG</option>
             </select>
         </div>
 
@@ -182,11 +196,43 @@
         const modelTypeSelect = document.getElementById('modelType');
         const newChatBtn = document.getElementById('newChatBtn');
 
+        // 🔊 播放语音
+        async function playTTS(text) {
+            try {
+                const res = await fetch('/chat/tts', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ text })
+                });
+                const data = await res.json();
+                if (data.success && data.url) {
+                    const audio = new Audio(data.url);
+                    audio.play();
+                } else {
+                    alert('[错误] 无法获取语音');
+                }
+            } catch (err) {
+                console.error(err);
+                alert('[错误] 请求语音接口失败');
+            }
+        }
+
+        // 🔊 在每条消息后面加按钮
         function appendMessage(role, content) {
             const msgDiv = document.createElement('div');
             msgDiv.classList.add('message', role);
+
             const safeHtml = DOMPurify.sanitize(marked.parse(content));
-            msgDiv.innerHTML = `<b>${role === 'user' ? '你' : 'AI'}:</b><br>${safeHtml}`;
+            // 使用 template 字符串时要小心 `content` 中的反引号和换行，这里做最小转义
+            const escapedContent = content.replace(/`/g, '\\`').replace(/\$/g, '\\$');
+            msgDiv.innerHTML = `
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <div style="flex:1;">
+                        <b>${role === 'user' ? '你' : 'AI'}:</b><br>${safeHtml}
+                    </div>
+                    <button class="tts-btn" onclick="playTTS(\`${escapedContent}\`)">🔊</button>
+                </div>
+            `;
             chatContainer.appendChild(msgDiv);
             chatContainer.scrollTop = chatContainer.scrollHeight;
         }
@@ -208,7 +254,7 @@
         }
 
         async function switchSession(id) {
-            currentSessionId = String(id); // ⚠️ 强制保持字符串
+            currentSessionId = String(id);
             tempSession = false;
             clearMessages();
 
@@ -217,7 +263,7 @@
                     const res = await fetch('/chat/history', {
                         method: 'POST',
                         headers: {'Content-Type':'application/json'},
-                        body: JSON.stringify({sessionId: currentSessionId}) // ⚠️ 直接传字符串
+                        body: JSON.stringify({sessionId: currentSessionId})
                     });
                     const data = await res.json();
                     if (data.success && Array.isArray(data.history)) {
@@ -251,6 +297,7 @@
 
             appendMessage('user', question);
 
+            // 发送到后端时 modelType 会随之传递（1/2/3）
             if (tempSession) {
                 try {
                     const response = await fetch('/chat/send-new-session', {
@@ -260,7 +307,7 @@
                     });
                     const data = await response.json();
                     if (data.success) {
-                        const sessionId = String(data.sessionId); // ⚠️ 转字符串
+                        const sessionId = String(data.sessionId);
                         sessions[sessionId] = {name: '新会话', messages: [
                             {role: 'user', content: question},
                             {role: 'assistant', content: data.Information}
@@ -285,7 +332,7 @@
                         body: JSON.stringify({
                             question,
                             modelType: modelTypeSelect.value,
-                            sessionId: currentSessionId  // ⚠️ 保持字符串
+                            sessionId: currentSessionId
                         })
                     });
                     const data = await response.json();
@@ -313,7 +360,7 @@
                 const res = await fetch('/chat/history', {
                     method: 'POST',
                     headers: {'Content-Type':'application/json'},
-                    body: JSON.stringify({sessionId: currentSessionId}) // ⚠️ 保持字符串
+                    body: JSON.stringify({sessionId: currentSessionId})
                 });
                 const data = await res.json();
                 if (data.success && Array.isArray(data.history)) {
@@ -335,14 +382,13 @@
             }
         });
 
-        // --- 页面加载时拉取用户的全部会话 ---
         async function loadSessions() {
             try {
                 const res = await fetch('/chat/sessions');
                 const data = await res.json();
                 if (data.success && Array.isArray(data.sessions)) {
                     data.sessions.forEach(s => {
-                        const sid = String(s.sessionId); // ⚠️ 转字符串
+                        const sid = String(s.sessionId);
                         sessions[sid] = {name: s.name || `会话 ${sid}`, messages: []};
                     });
                     renderSessionList();

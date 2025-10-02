@@ -36,40 +36,21 @@ void AIHelper::restoreMessage(const std::string& userInput,long long ms) {
 
 // 发送聊天消息
 std::string AIHelper::chat(int userId,std::string userName, std::string sessionId) {
+
     // 构造 payload
-    json payload;
-    payload["model"] = strategy->getModel();
-    json msgArray = json::array();
-
-    for (size_t i = 0; i < messages.size(); ++i) {
-        json msg;
-        if (i % 2 == 0) { // 偶数下标：用户
-            msg["role"] = "user";
-            msg["content"] = messages[i].first;
-        }
-        else { // 奇数下标：AI
-            msg["role"] = "assistant";
-            msg["content"] = messages[i].first;
-        }
-        msgArray.push_back(msg);
-    }
-
-    payload["messages"] = msgArray;
+    json payload = strategy->buildRequest(this->messages);
 
     // 打印 payload（缩进 4 个空格）
     //std::cout << "[DEBUG] payload = " << payload.dump(4) << std::endl;
 
-    // 执行请求
+    //执行请求
     json response = executeCurl(payload);
-
-    if (response.contains("choices") && !response["choices"].empty()) {
-        std::string answer = response["choices"][0]["message"]["content"];
-        // 保存 AI 回复
-        addMessage(userId,userName, false,answer,sessionId);
-        return answer;
+    std::string answer = strategy->parseResponse(response);
+    if (!answer.empty()) {
+        addMessage(userId, userName, false, answer, sessionId);
     }
 
-    return "[Error] 无法解析响应";
+    return answer.empty() ? "[Error] 无法解析响应" : answer;
 }
 
 // 发送自定义请求体

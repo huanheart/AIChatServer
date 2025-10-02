@@ -48,7 +48,7 @@ void ChatSpeechHandler::handle(const http::HttpRequest& req, http::HttpResponse*
         
         //这边参数先定死了
         // todo: 可以前端传对应音量大小这些信息，给到后端
-        std::string speechUrl = speechProcessor.synthesize(textToSynthesize, 
+        std::string speechUrl = speechProcessor.synthesize(text,
                                                            "mp3-16k", // 音频格式 
                                                            "zh", // 语言 
                                                             5, // 语速 

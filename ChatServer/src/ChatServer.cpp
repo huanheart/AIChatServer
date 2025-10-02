@@ -144,6 +144,8 @@ void ChatServer::initializeRouter() {
     //第二阶段新增
     httpServer_.Post("/chat/send-new-session", std::make_shared<ChatCreateAndSendHandler>(this));
     httpServer_.Get("/chat/sessions", std::make_shared<ChatSessionsHandler>(this));
+
+    httpServer_.Post("/chat/tts", std::make_shared<ChatSpeechHandler>(this));
 }
 
 void ChatServer::initializeSession() {

@@ -6,6 +6,9 @@
 #include <sstream>
 #include <memory>
 
+#include "../../../../HttpServer/include/utils/JsonUtil.h"
+
+
 // 策略接口
 class AIStrategy {
 public:
@@ -20,7 +23,11 @@ public:
     //返回对应model
     virtual std::string getModel() const = 0;
 
-    
+    // 构造请求体
+    virtual json buildRequest(const std::vector<std::pair<std::string, long long>>& messages) const = 0;
+
+    // 解析响应
+    virtual std::string parseResponse(const json& response) const = 0;
 
 };
 
@@ -36,6 +43,9 @@ public:
     std::string getApiUrl() const override;
     std::string getApiKey() const override;
     std::string getModel() const override;
+
+    json buildRequest(const std::vector<std::pair<std::string, long long>>& messages) const override;
+    std::string parseResponse(const json& response) const override;
 
 private:
     std::string apiKey_;
@@ -53,10 +63,34 @@ public:
     std::string getApiKey() const override;
     std::string getModel() const override;
 
+    json buildRequest(const std::vector<std::pair<std::string, long long>>& messages) const override;
+    std::string parseResponse(const json& response) const override;
 
 private:
     std::string apiKey_;
 };
+
+class AliyunRAGStrategy : public AIStrategy {
+
+public:
+    AliyunRAGStrategy() {
+        const char* key = std::getenv("DASHSCOPE_API_KEY");
+        if (!key) throw std::runtime_error("Aliyun API Key not found!");
+        apiKey_ = key;
+    }
+
+    std::string getApiUrl() const override;
+    std::string getApiKey() const override;
+    std::string getModel() const override;
+
+    json buildRequest(const std::vector<std::pair<std::string, long long>>& messages) const override;
+    std::string parseResponse(const json& response) const override;
+
+private:
+    std::string apiKey_;
+};
+
+
 
 
 
