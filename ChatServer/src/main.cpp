@@ -22,7 +22,7 @@ int main(int argc, char* argv[]) {
 	LOG_INFO << "pid = " << getpid();
 	std::string serverName = "ChatServer";
 	int port = 80;
-    // ²ÎÊý½âÎö
+    // 
     int opt;
     const char* str = "p:";
     while ((opt = getopt(argc, argv, str)) != -1)
@@ -41,13 +41,13 @@ int main(int argc, char* argv[]) {
     muduo::Logger::setLogLevel(muduo::Logger::WARN);
     ChatServer server(port, serverName);
     server.setThreadNum(4);
-    //Õâ±ßÒ»¶¨Òª½øÐÐË¯Ãß²Ù×÷£¬Èç¹û·ÅÔÚChatServer¹¹Ôìº¯ÊýÖÐ³õÊ¼»á³öÏÖ¿¨ËÀÏÖÏó
+    //Ò»ÒªË¯ß²ChatServerìº¯Ð³Ê¼Ö¿
     std::this_thread::sleep_for(std::chrono::seconds(2));
-    //³õÊ¼»¯chat_message±íµ½chatInformationÖÐ
+    //Ê¼chat_messagechatInformation
     server.initChatMessage();    
 
-    // ³õÊ¼»¯Ïû·Ñ¶ÓÁÐµÄÏß³Ì³Ø£¬´«Èë´¦Àíº¯Êý£¨Õâ±ßËùÓÐÏß³Ì¶¼×öÍ³Ò»µÄ´¦Àíº¯ÊýÂß¼­£©
-    //Èç¹ûÒª×öµ½Ð­³Ì¿âÄÇÖÖÃ¿¸öÏß³Ì×ö²»Í¬µÄÈÎÎñ£¬ÄÇÃ´Ò²¿ÉÒÔÔÙ·âÒ»²ãÈÎÎñÀà£¬Ïß³ÌÄÃÈ¡ÈÎÎñÀàÖÐµÄº¯Êý½øÐÐÖ´ÐÐ²Ù×÷
+    // Ê¼Ñ¶Ðµß³Ì³Ø£ë´¦ß³Ì¶Í³Ò»Ä´ß¼
+    //ÒªÐ­Ì¿Ã¿ß³Í¬Ã´Ò²Ù·Ò»à£¬ß³È¡ÐµÄºÖ´Ð²
     RabbitMQThreadPool pool(RABBITMQ_HOST, QUEUE_NAME, THREAD_NUM, executeMysql);
     pool.start();
 

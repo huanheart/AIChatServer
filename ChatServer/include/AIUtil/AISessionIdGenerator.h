@@ -9,9 +9,9 @@
 class AISessionIdGenerator {
 public:
     AISessionIdGenerator() {
-        // 初始化随机种子，只需一次
+        // 始樱只一
         std::srand(static_cast<unsigned>(std::time(nullptr)));
     }
-    //利用时间戳生成一个id
+    //时一id
     std::string generate();
 };

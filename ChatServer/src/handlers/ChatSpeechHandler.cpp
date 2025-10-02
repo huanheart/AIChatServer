@@ -5,12 +5,12 @@ void ChatSpeechHandler::handle(const http::HttpRequest& req, http::HttpResponse*
 {
     try
     {
-        // ºÏ≤È”√ªß «∑Ò“—µ«¬º
+        // √ª«∑—µ¬º
         auto session = server_->getSessionManager()->getSession(req, resp);
         LOG_INFO << "session->getValue(\"isLoggedIn\") = " << session->getValue("isLoggedIn");
         if (session->getValue("isLoggedIn") != "true")
         {
-            // ”√ªßŒ¥µ«¬º£¨∑µªÿŒ¥ ⁄»®¥ÌŒÛ
+            // √ªŒ¥¬ºŒ¥»®
             json errorResp;
             errorResp["status"] = "error";
             errorResp["message"] = "Unauthorized";
@@ -25,7 +25,7 @@ void ChatSpeechHandler::handle(const http::HttpRequest& req, http::HttpResponse*
         int userId = std::stoi(session->getValue("userId"));
         std::string username = session->getValue("username");
 
-        //µ˜”√∂‘”¶Ω”ø⁄
+        //√∂”¶”ø
         std::string text;
 
         auto body = req.getBody();
@@ -46,14 +46,14 @@ void ChatSpeechHandler::handle(const http::HttpRequest& req, http::HttpResponse*
 
         AISpeechProcessor speechProcessor(clientId, clientSecret);
         
-        //’‚±ﬂ≤Œ ˝œ»∂®À¿¡À
-        // todo: ø…“‘«∞∂À¥´∂‘”¶“Ù¡ø¥Û–°’‚–©–≈œ¢£¨∏¯µΩ∫Û∂À
+        //ﬂ≤»∂
+        // todo: «∞À¥”¶–°–©œ¢
         std::string speechUrl = speechProcessor.synthesize(text,
-                                                           "mp3-16k", // “Ù∆µ∏Ò Ω 
-                                                           "zh", // ”Ô—‘ 
-                                                            5, // ”ÔÀŸ 
-                                                            5, // “Ùµ˜ 
-                                                            5 ); // “Ù¡ø 
+                                                           "mp3-16k", // ∆µ Ω 
+                                                           "zh", //  
+                                                            5, //  
+                                                            5, //  
+                                                            5 ); //  
 
         json successResp;
         successResp["success"] = true;
@@ -68,7 +68,7 @@ void ChatSpeechHandler::handle(const http::HttpRequest& req, http::HttpResponse*
     }
     catch (const std::exception& e)
     {
-        // ≤∂ªÒ“Ï≥££¨∑µªÿ¥ÌŒÛ–≈œ¢
+        // Ï≥£ÿ¥œ¢
         json failureResp;
         failureResp["status"] = "error";
         failureResp["message"] = e.what();

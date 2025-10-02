@@ -35,7 +35,7 @@ class AIMenuHandler;
 class AIUploadHandler;
 class AIUploadSendHandler;
 
-//µÚ¶þ½×¶Î
+//Ú¶×¶
 class ChatCreateAndSendHandler;
 class ChatSessionsHandler;
 class ChatSpeechHandler;
@@ -60,7 +60,7 @@ private:
 	friend class AIUploadHandler;
 	friend class AIUploadSendHandler;
 	friend class ChatHistoryHandler;
-	//µÚ¶þ½×¶ÎÐÂÔö
+	//Ú¶×¶
 	friend class ChatCreateAndSendHandler;
 	friend class ChatSessionsHandler;
 	friend class ChatSpeechHandler;
@@ -86,21 +86,21 @@ private:
 	{
 		return httpServer_.getSessionManager();
 	}
-	//¼àÌýÇ°¶ËµÄhttpServer
+	//Ç°ËµhttpServer
 	http::HttpServer	httpServer_;
-	//ºÍÊý¾Ý¿â½»»¥
+	//Ý¿â½»
 	http::MysqlUtil		mysqlUtil_;
-	//±£Ö¤Ò»¸öÓÃ»§Ö»ÄÜÔÚÍ¬Ò»¸öµØµãµÇÂ¼Ò»´Î
+	//Ö¤Ò»Ã»Ö»Í¬Ò»ØµÂ¼Ò»
 	std::unordered_map<int, bool>	onlineUsers_;
 	std::mutex	mutexForOnlineUsers_;
-	//Ã¿Ò»¸öÈË¶¼ÓÐ¶ÔÓ¦µÄ¶Ô»° userid->AIHelper
-	//×¢Òâ£º´æ·ÅÖ¸ÕëÊÇÒòÎªºóÐøÐèÒª¶ÔchatInformation[key]½øÐÐ¸ü¸Ä
-	//ÈôÖ±½Ó´æ·Å¶ÔÏó£¬²»´æ·ÅÖ¸Õë£¬ÄÇÃ´ÓÉÓÚunordered_map²»ÊÇÏß³Ì°²È«µÄ£¬ÐèÒª¼ÓËø¶ÔÆä
-	//ÀïÃæµÄvector½øÐÐ²åÈë²Ù×÷£¬ÄÇÃ´ÓÃ»§A·ÃÎÊAIµÄ²Ù×÷¾Í»áÑÏÖØÓ°Ïìµ½ÓÃ»§B
+	//Ã¿Ò»Ë¶Ð¶Ó¦Ä¶Ô» userid->AIHelper
+	//×¢â£ºÖ¸ÎªÒªchatInformation[key]Ð¸
+	//Ö±Ó´Å¶ó£¬²Ö¸ë£¬Ã´unordered_mapß³Ì°È«Ä£Òª
+	//vectorÐ²Ã´Ã»AAIÄ²Í»Ó°ìµ½Ã»B
 	
-	//Ò»¸öÓÃ»§Ö»ÄÜÓÐÒ»¸ö¶Ô»°
+	//Ò»Ã»Ö»Ò»Ô»
 	// std::unordered_map<int, std::shared_ptr<AIHelper>> chatInformation;
-	//¸ü¸Ä³Éµ¥ÓÃ»§¶à¶Ô»°ÐÎÊ½
+	//Ä³ÉµÃ»Ô»Ê½
 	std::unordered_map<int, std::unordered_map<std::string,std::shared_ptr<AIHelper> > > chatInformation;
 	std::mutex	mutexForChatInformation;
 

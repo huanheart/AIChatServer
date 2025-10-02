@@ -30,10 +30,10 @@ private:
 
 
 
-//×¢Òâ£ºÕâÀï¿ÉÒÔÉè¼ÆÎªstatic std::shared_ptr<AIStrategy> instance = std::make_shared<T>();
-//¼´ºóĞø¶à¸öÓÃ»§ÊÇ¹²ÏíÒ»¸ö"²ßÂÔ"µÄ£¬²»»áÃ¿´ÎÔÚmapÖĞ²éµ½ÁËºóĞÂ´´½¨Ò»¸ö²ßÂÔ
+//×¢â£ºÎªstatic std::shared_ptr<AIStrategy> instance = std::make_shared<T>();
+//Ã»Ç¹Ò»""Ä£Ã¿mapĞ²éµ½ËºÂ´Ò»
 
-//µ«ÊÇÎÒÔÚ´úÂëÖĞÒÀ¾ÉÃ»Ğ´static£¬±£Ö¤Ã¿¸öÓÃ»§¶¼ÓĞ×Ô¼º¶ÀÌØµÄ"²ßÂÔ"£¬±£Ö¤Ïß³Ì°²È«
+//Ú´Ã»Ğ´staticÖ¤Ã¿Ã»Ô¼Øµ""Ö¤ß³Ì°È«
 
 template<typename T>
 struct StrategyRegister {

@@ -9,24 +9,24 @@
 #include "../../../../HttpServer/include/utils/JsonUtil.h"
 
 
-// 策略接口
+// 越涌
 class AIStrategy {
 public:
     virtual ~AIStrategy() = default;
 
-    // 返回API地址
+    // API址
     virtual std::string getApiUrl() const = 0;
 
-    // 返回API Key
+    // API Key
     virtual std::string getApiKey() const = 0;
 
-    //返回对应model
+    //囟应model
     virtual std::string getModel() const = 0;
 
-    // 构造请求体
+    // 
     virtual json buildRequest(const std::vector<std::pair<std::string, long long>>& messages) const = 0;
 
-    // 解析响应
+    // 应
     virtual std::string parseResponse(const json& response) const = 0;
 
 };

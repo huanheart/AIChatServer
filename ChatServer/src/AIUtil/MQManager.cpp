@@ -5,9 +5,9 @@ MQManager::MQManager(size_t poolSize)
     : poolSize_(poolSize), counter_(0) {
     for (size_t i = 0; i < poolSize_; ++i) {
         auto conn = std::make_shared<MQConn>();
-        // ±£Áô Create
+        //  Create
         conn->channel = AmqpClient::Channel::Create("localhost", 5672, "guest", "guest", "/");
-        // ÕâÀï²»ÖØ¸´ÉùÃ÷¶ÓÁÐ£¬±ÜÃâ exclusive use
+        // ï²»Ø¸Ð£ exclusive use
         pool_.push_back(conn);
     }
 }
@@ -38,24 +38,24 @@ void RabbitMQThreadPool::shutdown() {
 
 void RabbitMQThreadPool::worker(int id) {
     try {
-        // Ã¿¸öÏß³Ì¶ÀÁ¢ channel
+        // Ã¿ß³Ì¶ channel
         auto channel = AmqpClient::Channel::Create(rabbitmq_host_, 5672, "guest", "guest", "/");
-        // ÉùÃ÷¶ÓÁÐ£¨·Ç exclusive£©
+        // Ð£ exclusive
         channel->DeclareQueue(queue_name_, false, true, false, false);
-        //·ÀÖ¹³öÏÖ£ºchannel error: 403: AMQP_BASIC_CONSUME_METHOD caused: ACCESS_REFUSED - queue 
+        //Ö¹Ö£channel error: 403: AMQP_BASIC_CONSUME_METHOD caused: ACCESS_REFUSED - queue 
         // 'sql_queue' in vhost '/' in exclusive use
         //std::string consumer_tag = channel->BasicConsume(queue_name_, "");
         std::string consumer_tag = channel->BasicConsume(queue_name_, "", true, false, false);
 
-        channel->BasicQos(consumer_tag, 1); // Ã¿¸öÏß³ÌÒ»´ÎÖ»´¦ÀíÒ»ÌõÏûÏ¢
+        channel->BasicQos(consumer_tag, 1); // Ã¿ß³Ò»Ö»Ò»Ï¢
 
         while (!stop_) {
             AmqpClient::Envelope::ptr_t env;
-            bool ok = channel->BasicConsumeMessage(consumer_tag, env, 500); // 500ms ³¬Ê±
+            bool ok = channel->BasicConsumeMessage(consumer_tag, env, 500); // 500ms Ê±
             if (ok && env) {
                 std::string msg = env->Message()->Body();
-                handler_(msg);          // ÓÃ»§´¦ÀíÏûÏ¢
-                channel->BasicAck(env); // È·ÈÏÏûÏ¢
+                handler_(msg);          // Ã»Ï¢
+                channel->BasicAck(env); // È·Ï¢
             }
         }
 

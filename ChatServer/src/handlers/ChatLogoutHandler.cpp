@@ -13,26 +13,26 @@ void ChatLogoutHandler::handle(const http::HttpRequest& req, http::HttpResponse*
         return;
     }
 
-    // JSON ½âÎöÊ¹ÓÃ try catch ²¶»ñÒì³£
+    // JSON Ê¹ try catch ì³£
     try
     {
-        // »ñÈ¡»á»°
+        // È¡á»°
         auto session = server_->getSessionManager()->getSession(req, resp);
-        // »ñÈ¡ÓÃ»§id
+        // È¡Ã»id
         int userId = std::stoi(session->getValue("userId"));
-        // Çå³ı»á»°Êı¾İ
+        // á»°
         session->clear();
-        // Ïú»Ù»á»°
+        // Ù»á»°
         server_->getSessionManager()->destroySession(session->getId());
 
         json parsed = json::parse(req.getBody());
 
-        {   // ÊÍ·Å×ÊÔ´
+        {   // Í·Ô´
             std::lock_guard<std::mutex> lock(server_->mutexForOnlineUsers_);
             server_->onlineUsers_.erase(userId);
         }
 
-        // ·µ»ØÏìÓ¦±¨ÎÄ
+        // Ó¦
         json response;
         response["message"] = "logout successful";
         std::string responseBody = response.dump(4);
@@ -44,7 +44,7 @@ void ChatLogoutHandler::handle(const http::HttpRequest& req, http::HttpResponse*
     }
     catch (const std::exception& e)
     {
-        // ²¶»ñÒì³££¬·µ»Ø´íÎóĞÅÏ¢
+        // ì³£Ø´Ï¢
         json failureResp;
         failureResp["status"] = "error";
         failureResp["message"] = e.what();

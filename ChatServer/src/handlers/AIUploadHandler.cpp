@@ -5,12 +5,12 @@ void AIUploadHandler::handle(const http::HttpRequest& req, http::HttpResponse* r
 {
     try
     {
-        // ¼ì²éÓÃ»§ÊÇ·ñÒÑµÇÂ¼
+        // Ã»Ç·ÑµÂ¼
         auto session = server_->getSessionManager()->getSession(req, resp);
         LOG_INFO << "session->getValue(\"isLoggedIn\") = " << session->getValue("isLoggedIn");
         if (session->getValue("isLoggedIn") != "true")
         {
-            // ÓÃ»§Î´µÇÂ¼£¬·µ»ØÎ´ÊÚÈ¨´íÎó
+            // Ã»Î´Â¼Î´È¨
             json errorResp;
             errorResp["status"] = "error";
             errorResp["message"] = "Unauthorized";
@@ -21,7 +21,7 @@ void AIUploadHandler::handle(const http::HttpRequest& req, http::HttpResponse* r
                 errorBody, resp);
             return;
         }
-        // »ñÈ¡ÓÃ»§ĞÅÏ¢
+        // È¡Ã»Ï¢
         int userId = std::stoi(session->getValue("userId"));
         std::string username = session->getValue("username");
 
@@ -34,10 +34,10 @@ void AIUploadHandler::handle(const http::HttpRequest& req, http::HttpResponse* r
         }
 
         std::vector<char> buffer(fileOperater.size());
-        fileOperater.readFile(buffer); // ¶Á³öÎÄ¼şÊı¾İ
+        fileOperater.readFile(buffer); // Ä¼
         std::string htmlContent(buffer.data(), buffer.size());
 
-        // ÔÚHTMLÄÚÈİÖĞ²åÈëuserId
+        // HTMLĞ²userId
         size_t headEnd = htmlContent.find("</head>");
         if (headEnd != std::string::npos)
         {
@@ -52,7 +52,7 @@ void AIUploadHandler::handle(const http::HttpRequest& req, http::HttpResponse* r
     }
     catch (const std::exception& e)
     {
-        // ²¶»ñÒì³££¬·µ»Ø´íÎóĞÅÏ¢
+        // ì³£Ø´Ï¢
         json failureResp;
         failureResp["status"] = "error";
         failureResp["message"] = e.what();

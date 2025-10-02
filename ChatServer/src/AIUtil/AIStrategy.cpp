@@ -91,7 +91,7 @@ std::string AliyunRAGStrategy::getApiUrl() const {
     const char* key = std::getenv("Knowledge_Base_ID");
     if (!key) throw std::runtime_error("Knowledge_Base_ID not found!");
     std::string id(key);
-    //¼ÓÉÏ¶ÔÓ¦µÄÖªÊ¶¿âID
+    //Ï¶Ó¦ÖªÊ¶ID
     return "https://dashscope.aliyuncs.com/api/v1/apps/"+id+"/completion";
 }
 
@@ -101,7 +101,7 @@ std::string AliyunRAGStrategy::getApiKey()const {
 
 
 std::string AliyunRAGStrategy::getModel() const {
-    return ""; //²»ÐèÒªµ¥¶ÀµÄÄ£ÐÍ
+    return ""; //ÒªÄ£
 }
 
 
@@ -128,7 +128,7 @@ std::string AliyunRAGStrategy::parseResponse(const json& response) const {
 }
 
 
-// ×¢²áµ½¹¤³§
+// ×¢áµ½
 static StrategyRegister<AliyunStrategy> regAliyun("1");
 static StrategyRegister<DouBaoStrategy> regDoubao("2");
 static StrategyRegister<AliyunRAGStrategy> regAliyunRag("3");

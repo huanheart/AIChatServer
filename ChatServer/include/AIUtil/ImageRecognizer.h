@@ -10,17 +10,17 @@
 
 class ImageRecognizer {
 public:
-    // ¹¹Ôìº¯Êı£º´«ÈëÄ£ĞÍÂ·¾¶ºÍ±êÇ©Â·¾¶
+    // ìº¯Ä£Â·Í±Ç©Â·
     explicit ImageRecognizer(const std::string& model_path,
         const std::string& label_path = "/root/imagenet_classes.txt");
 
-    // ´ÓÎÄ¼şÔ¤²â
+    // Ä¼Ô¤
     std::string PredictFromFile(const std::string& image_path);
 
-    // ´ÓÄÚ´æÊı¾İÔ¤²â£¨Ç°¶ËÉÏ´«µÄÍ¼Æ¬¶ş½øÖÆÁ÷£©
+    // Ú´Ô¤â£¨Ç°Ï´Í¼Æ¬
     std::string PredictFromBuffer(const std::vector<unsigned char>& image_data);
 
-    // ´Ó OpenCV Mat Ô¤²â
+    //  OpenCV Mat Ô¤
     std::string PredictFromMat(const cv::Mat& img);
 
 private:
@@ -33,7 +33,7 @@ private:
     std::vector<int64_t> input_shape;
     int input_height{}, input_width{};
 
-    std::vector<std::string> labels; // Àà±ğ±êÇ©±í
+    std::vector<std::string> labels; // Ç©
 
     void LoadLabels(const std::string& label_path);
 };

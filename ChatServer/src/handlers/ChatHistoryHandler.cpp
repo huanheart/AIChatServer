@@ -4,12 +4,12 @@ void ChatHistoryHandler::handle(const http::HttpRequest& req, http::HttpResponse
 {
     try
     {
-        // ¼ì²éÓÃ»§ÊÇ·ñÒÑµÇÂ¼
+        // Ã»Ç·ÑµÂ¼
         auto session = server_->getSessionManager()->getSession(req, resp);
         LOG_INFO << "session->getValue(\"isLoggedIn\") = " << session->getValue("isLoggedIn");
         if (session->getValue("isLoggedIn") != "true")
         {
-            // ÓÃ»§Î´µÇÂ¼£¬·µ»ØÎ´ÊÚÈ¨´íÎó
+            // Ã»Î´Â¼Î´È¨
             json errorResp;
             errorResp["status"] = "error";
             errorResp["message"] = "Unauthorized";
@@ -21,7 +21,7 @@ void ChatHistoryHandler::handle(const http::HttpRequest& req, http::HttpResponse
             return;
         }
 
-        // »ñÈ¡ÓÃ»§ĞÅÏ¢ÒÔ¼°»ñÈ¡ÓÃ»§¶ÔÓ¦µÄ±íÊı¾İ
+        // È¡Ã»Ï¢Ô¼È¡Ã»Ó¦Ä±
         int userId = std::stoi(session->getValue("userId"));
         std::string username = session->getValue("username");
 
@@ -41,7 +41,7 @@ void ChatHistoryHandler::handle(const http::HttpRequest& req, http::HttpResponse
             auto& userSessions = server_->chatInformation[userId];
 
             if (userSessions.find(sessionId) == userSessions.end()) {
-                // ²åÈëÒ»¸öĞÂµÄ AIHelper
+                // Ò»Âµ AIHelper
                 userSessions.emplace( 
                     sessionId,
                     std::make_shared<AIHelper>()
@@ -74,7 +74,7 @@ void ChatHistoryHandler::handle(const http::HttpRequest& req, http::HttpResponse
     }
     catch (const std::exception& e)
     {
-        // ²¶»ñÒì³££¬·µ»Ø´íÎóĞÅÏ¢
+        // ì³£Ø´Ï¢
         json failureResp;
         failureResp["status"] = "error";
         failureResp["message"] = e.what();

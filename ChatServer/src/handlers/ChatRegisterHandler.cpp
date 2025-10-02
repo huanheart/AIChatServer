@@ -3,17 +3,17 @@
 
 void ChatRegisterHandler::handle(const http::HttpRequest& req, http::HttpResponse* resp)
 {
-    // ½âÎöbody(json¸ñÊ½)
+    // body(jsonÊ½)
     json parsed = json::parse(req.getBody());
     std::string username = parsed["username"];
     std::string password = parsed["password"];
 
-    // ÅĞ¶ÏÓÃ»§ÊÇ·ñÒÑ¾­´æÔÚ£¬Èç¹û´æÔÚÔò×¢²áÊ§°Ü
+    // Ğ¶Ã»Ç·Ñ¾Ú£×¢Ê§
     int userId = insertUser(username, password);
     if (userId != -1)
     {
-        // ²åÈë³É¹¦
-        // ·â×°³É¹¦ÏìÓ¦
+        // É¹
+        // ×°É¹Ó¦
         json successResp;
         successResp["status"] = "success";
         successResp["message"] = "Register successful";
@@ -28,7 +28,7 @@ void ChatRegisterHandler::handle(const http::HttpRequest& req, http::HttpRespons
     }
     else
     {
-        // ²åÈëÊ§°Ü
+        // Ê§
         json failureResp;
         failureResp["status"] = "error";
         failureResp["message"] = "username already exists";
@@ -44,10 +44,10 @@ void ChatRegisterHandler::handle(const http::HttpRequest& req, http::HttpRespons
 
 int ChatRegisterHandler::insertUser(const std::string& username, const std::string& password)
 {
-    // ÅĞ¶ÏÓÃ»§ÊÇ·ñ´æÔÚ£¬Èç¹û´æÔÚÔò·µ»Ø-1£¬·ñÔò·µ»ØÓÃ»§id
+    // Ğ¶Ã»Ç·Ú£ò·µ»-1ò·µ»Ã»id
     if (!isUserExist(username))
     {
-        // ÓÃ»§²»´æÔÚ£¬²åÈëÓÃ»§
+        // Ã»Ú£Ã»
         std::string sql = "INSERT INTO users (username, password) VALUES ('" + username + "', '" + password + "')";
         mysqlUtil_.executeUpdate(sql);
         std::string sql2 = "SELECT id FROM users WHERE username = '" + username + "'";
@@ -76,7 +76,7 @@ int ChatRegisterHandler::insertUser(const std::string& username, const std::stri
             }
             catch (const std::exception& e) {
                 std::cerr << "Failed to read row: " << e.what() << std::endl;
-                continue; // Ìø¹ıÒì³£ĞĞ
+                continue; // ì³£
             }
         }
         */
