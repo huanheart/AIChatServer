@@ -21,7 +21,7 @@ public:
 private:
     std::unordered_map<std::string, ToolFunc> tools_;
 
-    // ¹¤¾ßº¯Êý
+    // Â¹Â¤Â¾ÃŸÂºÂ¯ÃŠÃ½
     static size_t WriteCallback(void* contents, size_t size, size_t nmemb, std::string* output);
     static json getWeather(const json& args);
     static json getTime(const json& args);

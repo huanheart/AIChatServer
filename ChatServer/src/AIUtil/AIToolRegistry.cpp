@@ -1,18 +1,18 @@
 #include "../include/AIUtil/AIToolRegistry.h"
 #include <sstream>
 
-// ---------------- 构造函数 ----------------
+// ---------------- 鹿鹿脭矛潞炉脢媒 ----------------
 AIToolRegistry::AIToolRegistry() {
     registerTool("get_weather", getWeather);
     registerTool("get_time", getTime);
 }
 
-// ---------------- 注册工具 ----------------
+// ---------------- 脳垄虏谩鹿陇戮脽 ----------------
 void AIToolRegistry::registerTool(const std::string& name, ToolFunc func) {
     tools_[name] = func;
 }
 
-// ---------------- 调用工具 ----------------
+// ---------------- 碌梅脫脙鹿陇戮脽 ----------------
 json AIToolRegistry::invoke(const std::string& name, const json& args) const {
     auto it = tools_.find(name);
     if (it == tools_.end()) {
@@ -21,19 +21,19 @@ json AIToolRegistry::invoke(const std::string& name, const json& args) const {
     return it->second(args);
 }
 
-// ---------------- 判断是否存在 ----------------
+// ---------------- 脜脨露脧脢脟路帽麓忙脭脷 ----------------
 bool AIToolRegistry::hasTool(const std::string& name) const {
     return tools_.count(name) > 0;
 }
 
-// ---------------- CURL 回调 ----------------
+// ---------------- CURL 禄脴碌梅 ----------------
 size_t AIToolRegistry::WriteCallback(void* contents, size_t size, size_t nmemb, std::string* output) {
     size_t totalSize = size * nmemb;
     output->append((char*)contents, totalSize);
     return totalSize;
 }
 
-// ---------------- 获取天气 ----------------
+// ---------------- 禄帽脠隆脤矛脝酶 ----------------
 json AIToolRegistry::getWeather(const json& args) {
     if (!args.contains("city")) {
         return json{ {"error", "Missing parameter: city"} };
@@ -42,7 +42,7 @@ json AIToolRegistry::getWeather(const json& args) {
     std::string city = args["city"].get<std::string>();
     std::string encodedCity;
 
-    // URL 编码中文城市
+    // URL 卤脿脗毛脰脨脦脛鲁脟脢脨
     char* encoded = curl_easy_escape(nullptr, city.c_str(), city.length());
     if (encoded) {
         encodedCity = encoded;
@@ -74,11 +74,11 @@ json AIToolRegistry::getWeather(const json& args) {
         return json{ {"error", "CURL request failed"} };
     }
 
-    // 返回简洁格式的天气字符串
+    // 路碌禄脴录貌陆脿赂帽脢陆碌脛脤矛脝酶脳脰路没麓庐
     return json{ {"city", city}, {"weather", response} };
 }
 
-// ---------------- 获取时间 ----------------
+// ---------------- 禄帽脠隆脢卤录盲 ----------------
 json AIToolRegistry::getTime(const json& args) {
     (void)args;
     std::time_t t = std::time(nullptr);

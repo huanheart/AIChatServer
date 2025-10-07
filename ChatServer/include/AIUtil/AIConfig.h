@@ -6,23 +6,23 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
-#include "../../../../HttpServer/include/utils/JsonUtil.h"  // 假设封装了 nlohmann::json
+#include "../../../../HttpServer/include/utils/JsonUtil.h"  // 录脵脡猫路芒脳掳脕脣 nlohmann::json
 
-// 结构体：单个工具信息
+// 陆谩鹿鹿脤氓拢潞碌楼赂枚鹿陇戮脽脨脜脧垄
 struct AITool {
     std::string name;
     std::unordered_map<std::string, std::string> params;
     std::string desc;
 };
 
-// 结构体：AI 响应中工具调用结果
+// 陆谩鹿鹿脤氓拢潞AI 脧矛脫娄脰脨鹿陇戮脽碌梅脫脙陆谩鹿没
 struct AIToolCall {
     std::string toolName;
     json args;
     bool isToolCall = false;
 };
 
-// 配置管理类
+// 脜盲脰脙鹿脺脌铆脌脿
 class AIConfig {
 public:
     bool loadFromFile(const std::string& path);

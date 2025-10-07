@@ -54,8 +54,9 @@ std::string AIHelper::chat(int userId,std::string userName, std::string sessionI
     }
     //说明支持MCP
     AIConfig config;
-    config.loadFromFile("../../resource/config.json");
+    config.loadFromFile("../AIApps/ChatServer/resource/config.json");
     std::string tempUserQuestion =config.buildPrompt(userQuestion);
+    std::cout << "tempUserQuestion is " << tempUserQuestion << std::endl;
     messages.push_back({ tempUserQuestion, 0 });
 
     json firstReq = strategy->buildRequest(this->messages);
@@ -64,16 +65,16 @@ std::string AIHelper::chat(int userId,std::string userName, std::string sessionI
     // 用完立即移除提示词
     messages.pop_back();
 
-    //start
-
+    std::cout << "aiResult is " << aiResult << std::endl;
     // 解析AI响应（是否工具调用）
     AIToolCall call = config.parseAIResponse(aiResult);
-
 
     // 情况1：AI 不调用工具
     if (!call.isToolCall) {
         addMessage(userId, userName, true, userQuestion, sessionId);
         addMessage(userId, userName, false, aiResult, sessionId);
+
+        std::cout << "No tools required" << std::endl;
         return aiResult;
     }
 
@@ -83,18 +84,23 @@ std::string AIHelper::chat(int userId,std::string userName, std::string sessionI
 
     try {
         toolResult = registry.invoke(call.toolName, call.args);
+        std::cout << "Tool call success" << std::endl;
     }
     catch (const std::exception& e) {
         //大多数情况都不会走这里
         std::string err = "[工具调用失败] " + std::string(e.what());
         addMessage(userId, userName, true, userQuestion, sessionId);
         addMessage(userId, userName, false, err, sessionId);
+
+        std::cout << "Tool call failed" << std::endl << std::string(e.what());
         return err;
     }
 
     // 第二次调用AI
     // 用同样的 prompt_template，但说明工具执行过
     std::string secondPrompt = config.buildToolResultPrompt(userQuestion, call.toolName, call.args, toolResult);
+    
+    std::cout << "secondPrompt is " << secondPrompt << std::endl;
     messages.push_back({ secondPrompt, 0 });
 
     json secondReq = strategy->buildRequest(messages);
@@ -102,6 +108,8 @@ std::string AIHelper::chat(int userId,std::string userName, std::string sessionI
     std::string finalAnswer = strategy->parseResponse(secondResp);
     //删除包含提示词的信息
     messages.pop_back();
+
+    std::cout << "finalAnswer is " << finalAnswer << std::endl;
 
     addMessage(userId, userName, true, userQuestion, sessionId);
     addMessage(userId, userName, false, finalAnswer, sessionId);
@@ -209,3 +217,4 @@ void AIHelper::pushMessageToMysql(int userId, const std::string& userName, bool 
 
     MQManager::instance().publish("sql_queue", sql);
 }
+

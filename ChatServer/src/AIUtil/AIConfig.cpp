@@ -44,7 +44,7 @@ std::string AIConfig::buildToolList() const {
             oss << key;
             first = false;
         }
-        oss << ") → " << t.desc << "\n";
+        oss << ") 隆煤 " << t.desc << "\n";
     }
     return oss.str();
 }
@@ -84,11 +84,11 @@ std::string AIConfig::buildToolResultPrompt(
     const json& toolResult) const
 {
     std::ostringstream oss;
-    oss << "下面是用户说的话：" << userInput << "\n"
-        << "我刚才调用了工具 [" << toolName << "] ，参数为："
+    oss << "脧脗脙忙脢脟脫脙禄搂脣碌碌脛禄掳拢潞" << userInput << "\n"
+        << "脦脪赂脮虏脜碌梅脫脙脕脣鹿陇戮脽 [" << toolName << "] 拢卢虏脦脢媒脦陋拢潞"
         << toolArgs.dump() << "\n"
-        << "工具返回的结果如下：\n" << toolResult.dump(4) << "\n"
-        << "请根据以上信息，用自然语言回答用户。";
+        << "鹿陇戮脽路碌禄脴碌脛陆谩鹿没脠莽脧脗拢潞\n" << toolResult.dump(4) << "\n"
+        << "脟毛赂霉戮脻脪脭脡脧脨脜脧垄拢卢脫脙脳脭脠禄脫茂脩脭禄脴麓冒脫脙禄搂隆拢";
     return oss.str();
 }
 
