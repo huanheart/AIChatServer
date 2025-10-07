@@ -2,15 +2,15 @@
 
 void AIMenuHandler::handle(const http::HttpRequest& req, http::HttpResponse* resp)
 {
-    // JSON ʹ try catch 쳣
+
     try
     {
-        // ûǷѵ¼
+
         auto session = server_->getSessionManager()->getSession(req, resp);
         LOG_INFO << "session->getValue(\"isLoggedIn\") = " << session->getValue("isLoggedIn");
         if (session->getValue("isLoggedIn") != "true")
         {
-            // ûδ¼δȨ
+
             json errorResp;
             errorResp["status"] = "error";
             errorResp["message"] = "Unauthorized";
@@ -22,7 +22,7 @@ void AIMenuHandler::handle(const http::HttpRequest& req, http::HttpResponse* res
             return;
         }
 
-        // ȡûϢ
+
         int userId = std::stoi(session->getValue("userId"));
         std::string username = session->getValue("username");
 
@@ -38,7 +38,7 @@ void AIMenuHandler::handle(const http::HttpRequest& req, http::HttpResponse* res
         fileOperater.readFile(buffer); // ļ
         std::string htmlContent(buffer.data(), buffer.size());
 
-        // HTMLвuserId
+
         size_t headEnd = htmlContent.find("</head>");
         if (headEnd != std::string::npos)
         {
@@ -56,7 +56,7 @@ void AIMenuHandler::handle(const http::HttpRequest& req, http::HttpResponse* res
     }
     catch (const std::exception& e)
     {
-        // 쳣شϢ
+
         json failureResp;
         failureResp["status"] = "error";
         failureResp["message"] = e.what();

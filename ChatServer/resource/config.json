@@ -1,0 +1,17 @@
+{
+  "prompt_template": "请根据用户说的话：{user_input}\n你可以使用以下工具:\n{tool_list}\n如果需要调用，请输出JSON格式: {\"tool\":\"工具名\",\"args\":{\"key\":\"value\"}}\n如果只是回答用户的问题或闲聊，请直接输出文本回答，不要调用工具。",
+  "tools": [
+    {
+      "name": "get_weather",
+      "params": {
+        "city": "北京"
+      },
+      "desc": "获取天气"
+    },
+    {
+      "name": "get_time",
+      "params": {},
+      "desc": "获取当前时间"
+    }
+  ]
+}

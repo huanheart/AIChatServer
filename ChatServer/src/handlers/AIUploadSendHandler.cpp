@@ -5,12 +5,12 @@ void AIUploadSendHandler::handle(const http::HttpRequest& req, http::HttpRespons
 {
     try
     {
-        // ûǷѵ¼
+
         auto session = server_->getSessionManager()->getSession(req, resp);
         LOG_INFO << "session->getValue(\"isLoggedIn\") = " << session->getValue("isLoggedIn");
         if (session->getValue("isLoggedIn") != "true")
         {
-            // ûδ¼δȨ
+
             json errorResp;
             errorResp["status"] = "error";
             errorResp["message"] = "Unauthorized";
@@ -21,17 +21,16 @@ void AIUploadSendHandler::handle(const http::HttpRequest& req, http::HttpRespons
                 errorBody, resp);
             return;
         }
-        //Ӧstart
-        // 1.  JSON 
+
         int userId = std::stoi(session->getValue("userId"));
         std::shared_ptr<ImageRecognizer> ImageRecognizerPtr;
         {
             std::lock_guard<std::mutex> lock(server_->mutexForImageRecognizerMap);
             if (server_->ImageRecognizerMap.find(userId) == server_->ImageRecognizerMap.end()) {
-                // һµ ImageRecognizer
+
                 server_->ImageRecognizerMap.emplace(
                     userId,
-                    std::make_shared<ImageRecognizer>("/root/models/mobilenetv2/mobilenetv2-7.onnx")  //todo:Ҫ/path/to/model.onnxĳʵ·
+                    std::make_shared<ImageRecognizer>("/root/models/mobilenetv2/mobilenetv2-7.onnx")  //todo:Remove hard coding
                 );
             }
             ImageRecognizerPtr = server_->ImageRecognizerMap[userId];
@@ -52,18 +51,18 @@ void AIUploadSendHandler::handle(const http::HttpRequest& req, http::HttpRespons
 
         std::string decodedData = base64_decode(imageBase64);
         std::vector<uchar> imgData(decodedData.begin(), decodedData.end());
-        //ʼʶ
+
         std::string className = ImageRecognizerPtr->PredictFromBuffer(imgData);
 
-        // 4. Ӧ
+
         json successResp;
         successResp["success"] = "ok";
         successResp["filename"] = filename;
         successResp["class_name"] = className;
-        //ģͶŶ
-        successResp["confidence"] = 0.95; // todo:дˣԴģﷵʵ
 
-        //end
+        successResp["confidence"] = 0.95; // todo:Calculating true confidence
+
+
         std::string successBody = successResp.dump(4);
 
         resp->setStatusLine(req.getVersion(), http::HttpResponse::k200Ok, "OK");
@@ -76,7 +75,7 @@ void AIUploadSendHandler::handle(const http::HttpRequest& req, http::HttpRespons
     }
     catch (const std::exception& e)
     {
-        // 쳣شϢ
+
         json failureResp;
         failureResp["status"] = "error";
         failureResp["message"] = e.what();

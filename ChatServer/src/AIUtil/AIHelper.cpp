@@ -26,7 +26,7 @@ void AIHelper::addMessage(int userId,const std::string& userName, bool is_user,c
     auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
     messages.push_back({ userInput,ms });
     //消息队列异步入库
-    pushMessageToMysql(userId, userName, is_user, userInput,ms,sessionId);
+    pushMessageToMysql(userId, userName, is_user, userInput, ms, sessionId);
 }
 
 void AIHelper::restoreMessage(const std::string& userInput,long long ms) {
@@ -35,22 +35,78 @@ void AIHelper::restoreMessage(const std::string& userInput,long long ms) {
 
 
 // 发送聊天消息
-std::string AIHelper::chat(int userId,std::string userName, std::string sessionId) {
+std::string AIHelper::chat(int userId,std::string userName, std::string sessionId, std::string userQuestion, std::string modelType) {
 
-    // 构造 payload
-    json payload = strategy->buildRequest(this->messages);
+    //设置策略
+    setStrategy(StrategyFactory::instance().create(modelType));
 
-    // 打印 payload（缩进 4 个空格）
-    //std::cout << "[DEBUG] payload = " << payload.dump(4) << std::endl;
+    
+    if (false == strategy->isMCPModel) {
 
-    //执行请求
-    json response = executeCurl(payload);
-    std::string answer = strategy->parseResponse(response);
-    if (!answer.empty()) {
+        addMessage(userId, userName, true, userQuestion, sessionId);
+        json payload = strategy->buildRequest(this->messages);
+
+        //执行请求
+        json response = executeCurl(payload);
+        std::string answer = strategy->parseResponse(response);
         addMessage(userId, userName, false, answer, sessionId);
+        return answer.empty() ? "[Error] 无法解析响应" : answer;
+    }
+    //说明支持MCP
+    AIConfig config;
+    config.loadFromFile("../../resource/config.json");
+    std::string tempUserQuestion =config.buildPrompt(userQuestion);
+    messages.push_back({ tempUserQuestion, 0 });
+
+    json firstReq = strategy->buildRequest(this->messages);
+    json firstResp = executeCurl(firstReq);
+    std::string aiResult = strategy->parseResponse(firstResp);
+    // 用完立即移除提示词
+    messages.pop_back();
+
+    //start
+
+    // 解析AI响应（是否工具调用）
+    AIToolCall call = config.parseAIResponse(aiResult);
+
+
+    // 情况1：AI 不调用工具
+    if (!call.isToolCall) {
+        addMessage(userId, userName, true, userQuestion, sessionId);
+        addMessage(userId, userName, false, aiResult, sessionId);
+        return aiResult;
     }
 
-    return answer.empty() ? "[Error] 无法解析响应" : answer;
+    // 情况 2：AI 要调用工具
+    json toolResult;
+    AIToolRegistry registry;
+
+    try {
+        toolResult = registry.invoke(call.toolName, call.args);
+    }
+    catch (const std::exception& e) {
+        //大多数情况都不会走这里
+        std::string err = "[工具调用失败] " + std::string(e.what());
+        addMessage(userId, userName, true, userQuestion, sessionId);
+        addMessage(userId, userName, false, err, sessionId);
+        return err;
+    }
+
+    // 第二次调用AI
+    // 用同样的 prompt_template，但说明工具执行过
+    std::string secondPrompt = config.buildToolResultPrompt(userQuestion, call.toolName, call.args, toolResult);
+    messages.push_back({ secondPrompt, 0 });
+
+    json secondReq = strategy->buildRequest(messages);
+    json secondResp = executeCurl(secondReq);
+    std::string finalAnswer = strategy->parseResponse(secondResp);
+    //删除包含提示词的信息
+    messages.pop_back();
+
+    addMessage(userId, userName, true, userQuestion, sessionId);
+    addMessage(userId, userName, false, finalAnswer, sessionId);
+    return finalAnswer;
+
 }
 
 // 发送自定义请求体

@@ -5,12 +5,12 @@ void ChatSendHandler::handle(const http::HttpRequest& req, http::HttpResponse* r
 {
     try
     {
-        // ûǷѵ¼
+
         auto session = server_->getSessionManager()->getSession(req, resp);
         LOG_INFO << "session->getValue(\"isLoggedIn\") = " << session->getValue("isLoggedIn");
         if (session->getValue("isLoggedIn") != "true")
         {
-            // ûδ¼δȨ
+
             json errorResp;
             errorResp["status"] = "error";
             errorResp["message"] = "Unauthorized";
@@ -22,7 +22,7 @@ void ChatSendHandler::handle(const http::HttpRequest& req, http::HttpResponse* r
             return;
         }
 
-        // ȡûϢԼȡûӦı
+
         int userId = std::stoi(session->getValue("userId"));
         std::string username = session->getValue("username");
 
@@ -35,7 +35,7 @@ void ChatSendHandler::handle(const http::HttpRequest& req, http::HttpResponse* r
             auto j = json::parse(body);
             if (j.contains("question")) userQuestion = j["question"];
             if (j.contains("sessionId")) sessionId = j["sessionId"];
-            // Ĭϰ
+
             modelType = j.contains("modelType") ? j["modelType"].get<std::string>() : "1";
         }
 
@@ -47,7 +47,7 @@ void ChatSendHandler::handle(const http::HttpRequest& req, http::HttpResponse* r
             auto& userSessions = server_->chatInformation[userId];
 
             if (userSessions.find(sessionId) == userSessions.end()) {
-                // һµ AIHelper
+
                 userSessions.emplace( 
                     sessionId,
                     std::make_shared<AIHelper>()
@@ -56,14 +56,8 @@ void ChatSendHandler::handle(const http::HttpRequest& req, http::HttpResponse* r
             AIHelperPtr= userSessions[sessionId];
         }
         
-        //óûҪĲ
-        AIHelperPtr->setStrategy(StrategyFactory::instance().create(modelType));
 
-
-        //int userId, const std::string& userName, bool is_user, const std::string& userInput,std::string sessionId;
-        AIHelperPtr->addMessage(userId, username,true,userQuestion,sessionId);
-
-        std::string aiInformation=AIHelperPtr->chat(userId, username,sessionId);
+        std::string aiInformation=AIHelperPtr->chat(userId, username,sessionId, userQuestion, modelType);
         json successResp;
         successResp["success"] = true;
         successResp["Information"] = aiInformation;
@@ -78,7 +72,7 @@ void ChatSendHandler::handle(const http::HttpRequest& req, http::HttpResponse* r
     }
     catch (const std::exception& e)
     {
-        // 쳣شϢ
+
         json failureResp;
         failureResp["status"] = "error";
         failureResp["message"] = e.what();

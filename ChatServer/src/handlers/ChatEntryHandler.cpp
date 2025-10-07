@@ -4,11 +4,7 @@
 
 void ChatEntryHandler::handle(const http::HttpRequest& req, http::HttpResponse* resp)
 {
-    // ΪgeturlҲõˣǾͿֱӷӦ
 
-    //ַͨ�����һ·
-    //Ȼ󽫶Ӧ·µļͨFileUtilд򿪣
-    //ⲿݸֵstring bufferзӦ
     std::string reqFile;
     reqFile.append("../AIApps/ChatServer/resource/entry.html");
     FileUtil fileOperater(reqFile);
@@ -19,7 +15,7 @@ void ChatEntryHandler::handle(const http::HttpRequest& req, http::HttpResponse* 
     }
 
     std::vector<char> buffer(fileOperater.size());
-    fileOperater.readFile(buffer); // ļ
+    fileOperater.readFile(buffer); 
     std::string bufStr = std::string(buffer.data(), buffer.size());
 
     resp->setStatusLine(req.getVersion(), http::HttpResponse::k200Ok, "OK");

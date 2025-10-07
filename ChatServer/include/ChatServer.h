@@ -60,7 +60,7 @@ private:
 	friend class AIUploadHandler;
 	friend class AIUploadSendHandler;
 	friend class ChatHistoryHandler;
-	//ڶ׶
+
 	friend class ChatCreateAndSendHandler;
 	friend class ChatSessionsHandler;
 	friend class ChatSpeechHandler;
@@ -86,21 +86,18 @@ private:
 	{
 		return httpServer_.getSessionManager();
 	}
-	//ǰ˵httpServer
+
 	http::HttpServer	httpServer_;
-	//ݿ⽻
+
 	http::MysqlUtil		mysqlUtil_;
-	//֤һûֻͬһص¼һ
+
 	std::unordered_map<int, bool>	onlineUsers_;
 	std::mutex	mutexForOnlineUsers_;
-	//ÿһ˶жӦĶԻ userid->AIHelper
-	//ע⣺ָΪҪchatInformation[key]и
-	//ֱӴŶ󣬲ָ룬ôunordered_map̰߳ȫģҪ
-	//vectorвôûAAIĲͻӰ쵽ûB
+
 	
-	//һûֻһԻ
+
 	// std::unordered_map<int, std::shared_ptr<AIHelper>> chatInformation;
-	//ĳɵûԻʽ
+
 	std::unordered_map<int, std::unordered_map<std::string,std::shared_ptr<AIHelper> > > chatInformation;
 	std::mutex	mutexForChatInformation;
 

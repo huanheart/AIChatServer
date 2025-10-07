@@ -7,7 +7,7 @@ MQManager::MQManager(size_t poolSize)
         auto conn = std::make_shared<MQConn>();
         //  Create
         conn->channel = AmqpClient::Channel::Create("localhost", 5672, "guest", "guest", "/");
-        // ﲻظУ exclusive use
+
         pool_.push_back(conn);
     }
 }
@@ -38,24 +38,24 @@ void RabbitMQThreadPool::shutdown() {
 
 void RabbitMQThreadPool::worker(int id) {
     try {
-        // ÿ̶߳ channel
+        // Each thread has its own independent channel
         auto channel = AmqpClient::Channel::Create(rabbitmq_host_, 5672, "guest", "guest", "/");
-        // У exclusive
+        // set exclusive
         channel->DeclareQueue(queue_name_, false, true, false, false);
-        //ֹ֣channel error: 403: AMQP_BASIC_CONSUME_METHOD caused: ACCESS_REFUSED - queue 
+        // Prevent channel error: 403: AMQP_BASIC_CONSUME_METHOD caused: ACCESS_REFUSED - queue 
         // 'sql_queue' in vhost '/' in exclusive use
-        //std::string consumer_tag = channel->BasicConsume(queue_name_, "");
+        // std::string consumer_tag = channel->BasicConsume(queue_name_, "");
         std::string consumer_tag = channel->BasicConsume(queue_name_, "", true, false, false);
 
-        channel->BasicQos(consumer_tag, 1); // ÿ߳һֻһϢ
+        channel->BasicQos(consumer_tag, 1); 
 
         while (!stop_) {
             AmqpClient::Envelope::ptr_t env;
-            bool ok = channel->BasicConsumeMessage(consumer_tag, env, 500); // 500ms ʱ
+            bool ok = channel->BasicConsumeMessage(consumer_tag, env, 500); // 500ms 
             if (ok && env) {
                 std::string msg = env->Message()->Body();
-                handler_(msg);          // ûϢ
-                channel->BasicAck(env); // ȷϢ
+                handler_(msg);          
+                channel->BasicAck(env); 
             }
         }
 

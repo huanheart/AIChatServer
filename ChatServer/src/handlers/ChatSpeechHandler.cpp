@@ -5,12 +5,12 @@ void ChatSpeechHandler::handle(const http::HttpRequest& req, http::HttpResponse*
 {
     try
     {
-        // ûǷѵ¼
+
         auto session = server_->getSessionManager()->getSession(req, resp);
         LOG_INFO << "session->getValue(\"isLoggedIn\") = " << session->getValue("isLoggedIn");
         if (session->getValue("isLoggedIn") != "true")
         {
-            // ûδ¼δȨ
+
             json errorResp;
             errorResp["status"] = "error";
             errorResp["message"] = "Unauthorized";
@@ -25,7 +25,7 @@ void ChatSpeechHandler::handle(const http::HttpRequest& req, http::HttpResponse*
         int userId = std::stoi(session->getValue("userId"));
         std::string username = session->getValue("username");
 
-        //öӦӿ
+
         std::string text;
 
         auto body = req.getBody();
@@ -46,14 +46,13 @@ void ChatSpeechHandler::handle(const http::HttpRequest& req, http::HttpResponse*
 
         AISpeechProcessor speechProcessor(clientId, clientSecret);
         
-        //߲ȶ
-        // todo: ǰ˴ӦСЩϢ
+
         std::string speechUrl = speechProcessor.synthesize(text,
-                                                           "mp3-16k", // Ƶʽ 
-                                                           "zh", //  
-                                                            5, //  
-                                                            5, //  
-                                                            5 ); //  
+                                                           "mp3-16k", 
+                                                           "zh",  
+                                                            5, 
+                                                            5, 
+                                                            5 );  
 
         json successResp;
         successResp["success"] = true;
@@ -68,7 +67,6 @@ void ChatSpeechHandler::handle(const http::HttpRequest& req, http::HttpResponse*
     }
     catch (const std::exception& e)
     {
-        // 쳣شϢ
         json failureResp;
         failureResp["status"] = "error";
         failureResp["message"] = e.what();

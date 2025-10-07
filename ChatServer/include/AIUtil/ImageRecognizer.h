@@ -10,17 +10,17 @@
 
 class ImageRecognizer {
 public:
-    // 캯ģ·ͱǩ·
+    // Image model and label loading
     explicit ImageRecognizer(const std::string& model_path,
         const std::string& label_path = "/root/imagenet_classes.txt");
 
-    // ļԤ
+    // Predict from file
     std::string PredictFromFile(const std::string& image_path);
 
-    // ڴԤ⣨ǰϴͼƬ
+    //PredictFromBuffer
     std::string PredictFromBuffer(const std::vector<unsigned char>& image_data);
 
-    //  OpenCV Mat Ԥ
+    // Predict from OpenCV Mat
     std::string PredictFromMat(const cv::Mat& img);
 
 private:

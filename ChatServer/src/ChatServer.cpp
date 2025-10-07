@@ -35,16 +35,16 @@ ChatServer::ChatServer(int port,
 void ChatServer::initialize() {
     std::cout << "ChatServer initialize start  ! " << std::endl;
 	http::MysqlUtil::init("tcp://127.0.0.1:3306", "root", "123456", "ChatHttpServer", 5);
-    // ʼỰ
+
     initializeSession();
-    // ʼм
+
     initializeMiddleware();
-    // ʼ·
+
     initializeRouter();
 }
 
 void ChatServer::initChatMessage() {
-    //chat_messageݣָuser_idӦϢ뵽chatInformation
+
     std::cout << "initChatMessage start ! " << std::endl;
     readDataFromMySQL();
     std::cout << "initChatMessage success ! " << std::endl;
@@ -52,7 +52,7 @@ void ChatServer::initChatMessage() {
 
 void ChatServer::readDataFromMySQL() {
 
-    // SQL ѯ
+
     std::string sql = "SELECT id, username,session_id, is_user, content, ts FROM chat_message ORDER BY ts ASC, id ASC";
 
     sql::ResultSet* res;
@@ -66,14 +66,14 @@ void ChatServer::readDataFromMySQL() {
 
     while (res->next()) {
         long long user_id = 0;
-        std::string session_id ;   // ����ỰID
+        std::string session_id ;  
         std::string username, content;
         long long ts = 0;
         int is_user = 1;
 
         try {
-            user_id    = res->getInt64("id");          // ûID
-            session_id = res->getString("session_id");  // ỰID
+            user_id    = res->getInt64("id");       
+            session_id = res->getString("session_id");  
             username   = res->getString("username");
             content    = res->getString("content");
             ts         = res->getInt64("ts");
@@ -81,7 +81,7 @@ void ChatServer::readDataFromMySQL() {
         }
         catch (const std::exception& e) {
             std::cerr << "Failed to read row: " << e.what() << std::endl;
-            continue; // 쳣
+            continue; 
         }
 
         auto& userSessions = chatInformation[user_id];
@@ -95,10 +95,10 @@ void ChatServer::readDataFromMySQL() {
             helper = itSession->second;
         }
         
-        // ¼ỰID,Ϊÿû¼ҳչʾлỰ
+
         sessionsIdsMap[user_id].push_back(session_id);
 
-        // ָϢ
+
         helper->restoreMessage(content, ts);
     }
 
@@ -118,30 +118,29 @@ void ChatServer::start() {
 
 
 void ChatServer::initializeRouter() {
-    // עurlص
-    // ¼עҳ
+
     httpServer_.Get("/", std::make_shared<ChatEntryHandler>(this));
     httpServer_.Get("/entry", std::make_shared<ChatEntryHandler>(this));
-    // ¼
+    
     httpServer_.Post("/login", std::make_shared<ChatLoginHandler>(this));
-    // ע
+    
     httpServer_.Post("/register", std::make_shared<ChatRegisterHandler>(this));
-    //ǳ
+    
     httpServer_.Post("/user/logout", std::make_shared<ChatLogoutHandler>(this));
-    //ҳ
+
     httpServer_.Get("/chat", std::make_shared<ChatHandler>(this));
-    //
+
     httpServer_.Post("/chat/send", std::make_shared<ChatSendHandler>(this));
-    //˵ҳ
+ 
     httpServer_.Get("/menu", std::make_shared<AIMenuHandler>(this));
-    //ϴҳ
+    
     httpServer_.Get("/upload", std::make_shared<AIUploadHandler>(this));
-    //ϴ
+   
     httpServer_.Post("/upload/send", std::make_shared<AIUploadSendHandler>(this));
-    //ͬʷݣһε¼ݷظǰȾ
+    
     httpServer_.Post("/chat/history", std::make_shared<ChatHistoryHandler>(this));
 
-    //ڶ׶
+    
     httpServer_.Post("/chat/send-new-session", std::make_shared<ChatCreateAndSendHandler>(this));
     httpServer_.Get("/chat/sessions", std::make_shared<ChatSessionsHandler>(this));
 
@@ -149,18 +148,18 @@ void ChatServer::initializeRouter() {
 }
 
 void ChatServer::initializeSession() {
-    // Ự洢
+
     auto sessionStorage = std::make_unique<http::session::MemorySessionStorage>();
-    // Ự
+
     auto sessionManager = std::make_unique<http::session::SessionManager>(std::move(sessionStorage));
-    // ûỰ
+
     setSessionManager(std::move(sessionManager));
 }
 
 void ChatServer::initializeMiddleware() {
-    // м
+
     auto corsMiddleware = std::make_shared<http::middleware::CorsMiddleware>();
-    // м
+
     httpServer_.addMiddleware(corsMiddleware);
 }
 
@@ -195,7 +194,7 @@ void ChatServer::packageResp(const std::string& version,
     catch (const std::exception& e)
     {
         LOG_ERROR << "Error in packageResp: " << e.what();
-        // һĴӦ
+
         resp->setStatusCode(http::HttpResponse::k500InternalServerError);
         resp->setStatusMessage("Internal Server Error");
         resp->setCloseConnection(true);

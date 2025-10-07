@@ -3,15 +3,15 @@
 
 void ChatHandler::handle(const http::HttpRequest& req, http::HttpResponse* resp)
 {
-    // JSON ʹ try catch 쳣
+
     try
     {
-        // ûǷѵ¼
+
         auto session = server_->getSessionManager()->getSession(req, resp);
         LOG_INFO << "session->getValue(\"isLoggedIn\") = " << session->getValue("isLoggedIn");
         if (session->getValue("isLoggedIn") != "true")
         {
-            // ûδ¼δȨ
+
             json errorResp;
             errorResp["status"] = "error";
             errorResp["message"] = "Unauthorized";
@@ -23,7 +23,7 @@ void ChatHandler::handle(const http::HttpRequest& req, http::HttpResponse* resp)
             return;
         }
 
-        // ȡûϢ
+
         int userId = std::stoi(session->getValue("userId"));
         std::string username = session->getValue("username");
 
@@ -36,10 +36,10 @@ void ChatHandler::handle(const http::HttpRequest& req, http::HttpResponse* resp)
         }
 
         std::vector<char> buffer(fileOperater.size());
-        fileOperater.readFile(buffer); // ļ
+        fileOperater.readFile(buffer); 
         std::string htmlContent(buffer.data(), buffer.size());
 
-        // HTMLвuserId
+
         size_t headEnd = htmlContent.find("</head>");
         if (headEnd != std::string::npos)
         {
@@ -57,7 +57,7 @@ void ChatHandler::handle(const http::HttpRequest& req, http::HttpResponse* resp)
     }
     catch (const std::exception& e)
     {
-        // 쳣شϢ
+
         json failureResp;
         failureResp["status"] = "error";
         failureResp["message"] = e.what();
