@@ -91,13 +91,10 @@ void ChatServer::readDataFromMySQL() {
         if (itSession == userSessions.end()) {
             helper = std::make_shared<AIHelper>();
             userSessions[session_id] = helper;
+			sessionsIdsMap[user_id].push_back(session_id);
         } else {
             helper = itSession->second;
         }
-        
-
-        sessionsIdsMap[user_id].push_back(session_id);
-
 
         helper->restoreMessage(content, ts);
     }
