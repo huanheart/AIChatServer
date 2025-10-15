@@ -5,7 +5,7 @@
 #include"../AIUtil/AISessionIdGenerator.h"
 #include "../ChatServer.h"
 
-//Ϣʱ᷵sessionIdԼӦ
+
 
 class ChatCreateAndSendHandler : public http::router::RouterHandler
 {

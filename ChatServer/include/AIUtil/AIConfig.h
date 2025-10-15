@@ -6,23 +6,23 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
-#include "../../../../HttpServer/include/utils/JsonUtil.h"  // ¼ÙÉè·â×°ÁË nlohmann::json
+#include "../../../../HttpServer/include/utils/JsonUtil.h"  
 
-// ½á¹¹Ìå£ºµ¥¸ö¹¤¾ßÐÅÏ¢
+
 struct AITool {
     std::string name;
     std::unordered_map<std::string, std::string> params;
     std::string desc;
 };
 
-// ½á¹¹Ìå£ºAI ÏìÓ¦ÖÐ¹¤¾ßµ÷ÓÃ½á¹û
+
 struct AIToolCall {
     std::string toolName;
     json args;
     bool isToolCall = false;
 };
 
-// ÅäÖÃ¹ÜÀíÀà
+
 class AIConfig {
 public:
     bool loadFromFile(const std::string& path);

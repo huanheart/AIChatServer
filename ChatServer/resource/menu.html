@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>欢迎来到AI助手界面</title>
     <style>
-        /* 全局样式 */
+        
         body {
             margin: 0;
             padding: 0;
@@ -17,7 +17,7 @@
             background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
         }
 
-        /* 星空背景 */
+        
         .stars {
             width: 2px;
             height: 2px;
@@ -32,7 +32,7 @@
             50% { opacity: 1; }
         }
 
-        /* 加载动画容器 */
+        
         #loading-container {
             display: flex;
             flex-direction: column;
@@ -42,7 +42,7 @@
             text-align: center;
         }
 
-        /* 加载标题 */
+        
         #loading-title {
             font-size: 2.5em;
             margin-bottom: 30px;
@@ -57,7 +57,7 @@
             50% { text-shadow: 0 0 20px #00e1ff, 0 0 40px #00ffff; }
         }
 
-        /* 进度条 */
+        
         .progress-bar {
             width: 320px;
             height: 22px;
@@ -74,14 +74,14 @@
             transition: width 0.3s ease;
         }
 
-        /* 加载提示文字 */
+        
         #loading-text {
             margin-top: 20px;
             font-size: 1.2em;
             color: #ccc;
         }
 
-        /* 菜单页面样式 */
+        
         #menu-container {
             display: none;
             text-align: center;
@@ -134,7 +134,7 @@
 </head>
 
 <body>
-    <!-- 星空背景（随机星星） -->
+    
     <script>
         for (let i = 0; i < 80; i++) {
             let star = document.createElement("div");
@@ -146,7 +146,7 @@
         }
     </script>
 
-    <!-- 加载动画 -->
+    
     <div id="loading-container">
         <div id="loading-title">AI 助手 启动中...</div>
         <div class="progress-bar">
@@ -155,7 +155,7 @@
         <div id="loading-text">系统正在初始化，请稍候...</div>
     </div>
 
-    <!-- 菜单页面 -->
+    
     <div id="menu-container">
         <h1>✨ 欢迎来到 AI 助手 ✨</h1>
         <div class="menu-border"></div>
@@ -170,7 +170,7 @@
             const loadingContainer = document.getElementById('loading-container');
             const menuContainer = document.getElementById('menu-container');
 
-            // 动态进度条动画
+            
             let percent = 0;
             let interval = setInterval(() => {
                 percent += 10;

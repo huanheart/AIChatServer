@@ -9,9 +9,9 @@
 class AISessionIdGenerator {
 public:
     AISessionIdGenerator() {
-        // ʼӣֻһ
+        
         std::srand(static_cast<unsigned>(std::time(nullptr)));
     }
-    //ʱһid
+    
     std::string generate();
 };

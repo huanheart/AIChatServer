@@ -14,7 +14,7 @@ class AIStrategy {
 public:
     virtual ~AIStrategy() = default;
 
-    // APIַ
+    
     virtual std::string getApiUrl() const = 0;
 
     // API Key

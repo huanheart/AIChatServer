@@ -84,11 +84,11 @@ std::string AIConfig::buildToolResultPrompt(
     const json& toolResult) const
 {
     std::ostringstream oss;
-    oss << "ÏÂÃæÊÇÓÃ»§ËµµÄ»°£º" << userInput << "\n"
-        << "ÎÒ¸Õ²Åµ÷ÓÃÁË¹¤¾ß [" << toolName << "] £¬²ÎÊýÎª£º"
+    oss << "下面是用户说的话：" << userInput << "\n"
+        << "我刚才调用了工具 [" << toolName << "] ，参数为："
         << toolArgs.dump() << "\n"
-        << "¹¤¾ß·µ»ØµÄ½á¹ûÈçÏÂ£º\n" << toolResult.dump(4) << "\n"
-        << "Çë¸ù¾ÝÒÔÉÏÐÅÏ¢£¬ÓÃ×ÔÈ»ÓïÑÔ»Ø´ðÓÃ»§¡£";
+        << "工具返回的结果如下：\n" << toolResult.dump(4) << "\n"
+        << "请根据以上信息，用自然语言回答用户。";
     return oss.str();
 }
 

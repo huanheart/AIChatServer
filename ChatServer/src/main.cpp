@@ -41,13 +41,12 @@ int main(int argc, char* argv[]) {
     muduo::Logger::setLogLevel(muduo::Logger::WARN);
     ChatServer server(port, serverName);
     server.setThreadNum(4);
-    //һҪ˯߲ChatServer캯гʼֿ
+    
     std::this_thread::sleep_for(std::chrono::seconds(2));
-    //ʼchat_messagechatInformation
+    
     server.initChatMessage();    
 
-    // ʼѶе̳߳أ봦̶߳ͳһĴ߼
-    //ҪЭ̿ÿ߳ͬôҲٷһ࣬߳ȡеĺִв
+
     RabbitMQThreadPool pool(RABBITMQ_HOST, QUEUE_NAME, THREAD_NUM, executeMysql);
     pool.start();
 
